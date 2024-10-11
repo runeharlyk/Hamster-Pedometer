@@ -4,9 +4,9 @@
 /**
  *   ESP32 SvelteKit
  *
- *   A simple, secure and extensible framework for IoT projects for ESP32 platforms
- *   with responsive Sveltekit front-end built with TailwindCSS and DaisyUI.
- *   https://github.com/theelims/ESP32-sveltekit
+ *   A simple, secure and extensible framework for IoT projects for ESP32
+ *platforms with responsive Sveltekit front-end built with TailwindCSS and
+ *DaisyUI. https://github.com/theelims/ESP32-sveltekit
  *
  *   Copyright (C) 2018 - 2023 rjwats
  *   Copyright (C) 2023 - 2024 theelims
@@ -17,32 +17,33 @@
 
 #include <Arduino.h>
 
-#include <WiFi.h>
-#include <ESPmDNS.h>
-#include <AnalyticsService.h>
-#include <FeaturesService.h>
 #include <APSettingsService.h>
 #include <APStatus.h>
+#include <AnalyticsService.h>
 #include <AuthenticationService.h>
 #include <BatteryService.h>
-#include <FactoryResetService.h>
 #include <DownloadFirmwareService.h>
+#include <ESPFS.h>
+#include <ESPmDNS.h>
 #include <EventSocket.h>
+#include <FactoryResetService.h>
+#include <FeaturesService.h>
 #include <MqttSettingsService.h>
 #include <MqttStatus.h>
-#include <NotificationService.h>
 #include <NTPSettingsService.h>
 #include <NTPStatus.h>
-#include <UploadFirmwareService.h>
+#include <NotificationService.h>
+#include <PedoMeter.h>
+#include <PsychicHttp.h>
 #include <RestartService.h>
 #include <SecuritySettingsService.h>
 #include <SleepService.h>
 #include <SystemStatus.h>
+#include <UploadFirmwareService.h>
+#include <WiFi.h>
 #include <WiFiScanner.h>
 #include <WiFiSettingsService.h>
 #include <WiFiStatus.h>
-#include <ESPFS.h>
-#include <PsychicHttp.h>
 
 #ifdef EMBED_WWW
 #include <WWWData.h>
@@ -64,155 +65,120 @@
 #define ESP32SVELTEKIT_RUNNING_CORE -1
 #endif
 
-class ESP32SvelteKit
-{
+class ESP32SvelteKit {
 public:
-    ESP32SvelteKit(PsychicHttpServer *server, unsigned int numberEndpoints = 115);
+  ESP32SvelteKit(PsychicHttpServer *server, unsigned int numberEndpoints = 115);
 
-    void begin();
+  void begin();
 
-    FS *getFS()
-    {
-        return &ESPFS;
-    }
+  FS *getFS() { return &ESPFS; }
 
-    PsychicHttpServer *getServer()
-    {
-        return _server;
-    }
+  PsychicHttpServer *getServer() { return _server; }
 
-    SecurityManager *getSecurityManager()
-    {
-        return &_securitySettingsService;
-    }
+  SecurityManager *getSecurityManager() { return &_securitySettingsService; }
 
-    EventSocket *getSocket()
-    {
-        return &_socket;
-    }
+  EventSocket *getSocket() { return &_socket; }
 
 #if FT_ENABLED(FT_SECURITY)
-    StatefulService<SecuritySettings> *getSecuritySettingsService()
-    {
-        return &_securitySettingsService;
-    }
+  StatefulService<SecuritySettings> *getSecuritySettingsService() {
+    return &_securitySettingsService;
+  }
 #endif
 
-    StatefulService<WiFiSettings> *getWiFiSettingsService()
-    {
-        return &_wifiSettingsService;
-    }
+  StatefulService<WiFiSettings> *getWiFiSettingsService() {
+    return &_wifiSettingsService;
+  }
 
-    StatefulService<APSettings> *getAPSettingsService()
-    {
-        return &_apSettingsService;
-    }
+  StatefulService<APSettings> *getAPSettingsService() {
+    return &_apSettingsService;
+  }
 
-    NotificationService *getNotificationService()
-    {
-        return &_notificationService;
-    }
+  NotificationService *getNotificationService() {
+    return &_notificationService;
+  }
 
 #if FT_ENABLED(FT_NTP)
-    StatefulService<NTPSettings> *getNTPSettingsService()
-    {
-        return &_ntpSettingsService;
-    }
+  StatefulService<NTPSettings> *getNTPSettingsService() {
+    return &_ntpSettingsService;
+  }
 #endif
 
 #if FT_ENABLED(FT_MQTT)
-    StatefulService<MqttSettings> *getMqttSettingsService()
-    {
-        return &_mqttSettingsService;
-    }
+  StatefulService<MqttSettings> *getMqttSettingsService() {
+    return &_mqttSettingsService;
+  }
 
-    PsychicMqttClient *getMqttClient()
-    {
-        return _mqttSettingsService.getMqttClient();
-    }
+  PsychicMqttClient *getMqttClient() {
+    return _mqttSettingsService.getMqttClient();
+  }
 #endif
 
 #if FT_ENABLED(FT_SLEEP)
-    SleepService *getSleepService()
-    {
-        return &_sleepService;
-    }
+  SleepService *getSleepService() { return &_sleepService; }
 #endif
 
 #if FT_ENABLED(FT_BATTERY)
-    BatteryService *getBatteryService()
-    {
-        return &_batteryService;
-    }
+  BatteryService *getBatteryService() { return &_batteryService; }
 #endif
 
-    FeaturesService *getFeatureService()
-    {
-        return &_featureService;
-    }
+  FeaturesService *getFeatureService() { return &_featureService; }
 
-    void factoryReset()
-    {
-        _factoryResetService.factoryReset();
-    }
+  void factoryReset() { _factoryResetService.factoryReset(); }
 
-    void setMDNSAppName(String name)
-    {
-        _appName = name;
-    }
+  void setMDNSAppName(String name) { _appName = name; }
 
-    void recoveryMode()
-    {
-        _apSettingsService.recoveryMode();
-    }
+  void recoveryMode() { _apSettingsService.recoveryMode(); }
 
 private:
-    PsychicHttpServer *_server;
-    unsigned int _numberEndpoints;
-    FeaturesService _featureService;
-    SecuritySettingsService _securitySettingsService;
-    WiFiSettingsService _wifiSettingsService;
-    WiFiScanner _wifiScanner;
-    WiFiStatus _wifiStatus;
-    APSettingsService _apSettingsService;
-    APStatus _apStatus;
-    EventSocket _socket;
-    NotificationService _notificationService;
+  PsychicHttpServer *_server;
+  unsigned int _numberEndpoints;
+  FeaturesService _featureService;
+  SecuritySettingsService _securitySettingsService;
+  WiFiSettingsService _wifiSettingsService;
+  WiFiScanner _wifiScanner;
+  WiFiStatus _wifiStatus;
+  APSettingsService _apSettingsService;
+  APStatus _apStatus;
+  EventSocket _socket;
+  NotificationService _notificationService;
 #if FT_ENABLED(FT_NTP)
-    NTPSettingsService _ntpSettingsService;
-    NTPStatus _ntpStatus;
+  NTPSettingsService _ntpSettingsService;
+  NTPStatus _ntpStatus;
 #endif
 #if FT_ENABLED(FT_UPLOAD_FIRMWARE)
-    UploadFirmwareService _uploadFirmwareService;
+  UploadFirmwareService _uploadFirmwareService;
 #endif
 #if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
-    DownloadFirmwareService _downloadFirmwareService;
+  DownloadFirmwareService _downloadFirmwareService;
 #endif
 #if FT_ENABLED(FT_MQTT)
-    MqttSettingsService _mqttSettingsService;
-    MqttStatus _mqttStatus;
+  MqttSettingsService _mqttSettingsService;
+  MqttStatus _mqttStatus;
 #endif
 #if FT_ENABLED(FT_SECURITY)
-    AuthenticationService _authenticationService;
+  AuthenticationService _authenticationService;
 #endif
 #if FT_ENABLED(FT_SLEEP)
-    SleepService _sleepService;
+  SleepService _sleepService;
 #endif
 #if FT_ENABLED(FT_BATTERY)
-    BatteryService _batteryService;
+  BatteryService _batteryService;
 #endif
 #if FT_ENABLED(FT_ANALYTICS)
-    AnalyticsService _analyticsService;
+  AnalyticsService _analyticsService;
 #endif
-    RestartService _restartService;
-    FactoryResetService _factoryResetService;
-    SystemStatus _systemStatus;
+  RestartService _restartService;
+  FactoryResetService _factoryResetService;
+  SystemStatus _systemStatus;
+  PedoMeter _pedoMeter;
 
-    String _appName = APP_NAME;
+  String _appName = APP_NAME;
 
 protected:
-    static void _loopImpl(void *_this) { static_cast<ESP32SvelteKit *>(_this)->_loop(); }
-    void _loop();
+  static void _loopImpl(void *_this) {
+    static_cast<ESP32SvelteKit *>(_this)->_loop();
+  }
+  void _loop();
 };
 
 #endif

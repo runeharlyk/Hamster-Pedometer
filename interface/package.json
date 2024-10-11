@@ -16,9 +16,9 @@
 		"@sveltejs/adapter-auto": "^2.1.0",
 		"@sveltejs/adapter-static": "^2.0.3",
 		"@sveltejs/kit": "^1.22.4",
+		"@types/msgpack-lite": "^0.1.11",
 		"@typescript-eslint/eslint-plugin": "^6.2.1",
 		"@typescript-eslint/parser": "^6.2.1",
-		"@types/msgpack-lite": "^0.1.11",
 		"autoprefixer": "^10.4.14",
 		"eslint": "^8.46.0",
 		"eslint-config-prettier": "^9.0.0",
@@ -38,6 +38,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@iconify-json/mdi": "^1.2.1",
 		"chart.js": "^4.4.0",
 		"compare-versions": "^6.0.0",
 		"daisyui": "^4.10.2",

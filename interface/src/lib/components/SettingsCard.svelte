@@ -8,7 +8,7 @@
 
 {#if collapsible}
 	<div
-		class="bg-base-200 rounded-box shadow-primary/50 relative grid w-full max-w-2xl self-center overflow-hidden shadow-lg"
+		class="bg-base-200 rounded-box relative grid w-full max-w-2xl self-center overflow-hidden shadow-lg"
 	>
 		<div
 			class="min-h-16 flex w-full items-center justify-between space-x-3 p-4 text-xl font-medium"
@@ -41,7 +41,7 @@
 	</div>
 {:else}
 	<div
-		class="bg-base-200 rounded-box shadow-primary/50 relative grid w-full max-w-2xl self-center overflow-hidden shadow-lg"
+		class="bg-base-200 rounded-box relative grid w-full max-w-2xl self-center overflow-hidden shadow-lg"
 	>
 		<div class="min-h-16 w-full p-4 text-xl font-medium">
 			<span class="inline-flex items-baseline">
