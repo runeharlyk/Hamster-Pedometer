@@ -54,18 +54,11 @@ void PedoMeter::_loop() {
       if (!isInSession) {
         isInSession = true;
         _state.startSession();
+      } else {
+        _state.updateSession(timeElapsed);
       }
 
-      _state.updateSession(timeElapsed);
-
-      //   totalDistance += circumference;
-
-      //   float speedMetersPerSecond = circumference / timeElapsed;
-      // float speedKmPerHour = speedMetersPerSecond * 3.6;
-
       doc["time_elapsed"] = timeElapsed;
-      //   doc["totalDistance"] = totalDistance;
-      //   doc["speedMetersPerSecond"] = speedMetersPerSecond;
 
       JsonObject jsonObject = doc.as<JsonObject>();
       _socket->emitEvent(EVENT_STEP, jsonObject);
