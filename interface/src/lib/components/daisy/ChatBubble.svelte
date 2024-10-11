@@ -13,14 +13,14 @@
 	{#if $$slots.icon}
 		<div class="chat-image avatar">
 			<div class="w-10 rounded-full">
-				<slot name="icon"></slot>
+				<slot name="icon" />
 			</div>
 		</div>
 	{/if}
 
 	{#if $$slots.header}
 		<div class="chat-header">
-			<slot name="header"></slot>
+			<slot name="header" />
 		</div>
 	{/if}
 
@@ -39,7 +39,7 @@
 
 	{#if $$slots.footer}
 		<div class="chat-footer">
-			<slot name="footer"></slot>
+			<slot name="footer" />
 		</div>
 	{/if}
 </div>
