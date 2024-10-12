@@ -1,67 +1,97 @@
-# ESP32 SvelteKit - Create Amazing IoT Projects
+<div align="center">
+  <h1>
 
-<div style="flex">
-<img src="/docs/media/Screenshot_light.png" style="height:320px"> 
-<img src="/docs/media/Screenshot_mobile.png" style="height:320px"> 
+    Hamster - Pedometer 🐹💨👟
+
+  </h1>
+
+<h4>Ever wondered how long your hamster is running?</h4>
+
+<p>
+  <a href="#overview">Overview</a> •
+  <a href="#features">Key Features</a> •
+  <!-- <a href="#getting-started">Documentation</a> • -->
+  <a href="#credits">Credits</a> •
+  <a href="#license">License</a>
+</p>
+
+[![Frontend Tests](https://github.com/runeharlyk/SpotMicroESP32-Leika/actions/workflows/frontend-tests.yml/badge.svg)](https://github.com/runeharlyk/SpotMicroESP32-Leika/actions/workflows/frontend-tests.yml)
+[![PlatformIO CI](https://github.com/runeharlyk/SpotMicroESP32-Leika/actions/workflows/embedded-build.yml/badge.svg)](https://github.com/runeharlyk/SpotMicroESP32-Leika/actions/workflows/embedded-build.yml)
+
 </div>
+<!-- GIF ![screenshot](https://raw.githubusercontent.com/runeharlyk/SpotMicro-Leika/main/assets/logo.jpg) -->
 
-A simple and extensible framework for ESP32 based IoT projects with a feature-rich, beautiful, and responsive front-end build with [Sveltekit](https://kit.svelte.dev/), [TailwindCSS](https://tailwindcss.com/) and [DaisyUI](https://daisyui.com/). This is a project template to get you started in no time backed by a powerful back end service, an amazing front end served from the ESP32 and an easy to use build chain to get everything going.
+## 📜 Overview
 
-It was forked from the fabulous [rjwats/esp8266-react](https://github.com/rjwats/esp8266-react) project, from where it inherited the mighty back end services.
+This project aim to track hamsters routine, health and running stats.
+Built on an ESP32 with an external hall effect sensor and a couple of small magnets, it aims to be both affordable and accessible.
 
-> **Tip**: This template repository is not meant to be used stand alone. If you're just looking for a WiFi manager there are plenty of options available. This is a starting point when you need a rich web UI.
+## 🎯 Features
 
-## Features
+- **Real-Time Data**: Get real-time updates of your hamsters activities.
+- **Statistical analysis**: See statistical data.
+- **Nice UI**: Beatify, responsive UI.
+- **Highly customizable**
+- **Simple setup**: Flash the device and start your tracking journey.
+<!-- - **Notification**: Get weekly overview with push notifications. -->
 
-### :butterfly: Beautiful UI powered by DaisyUI and TailwindCSS
+## 🐹 Live hamster feed
 
-Beautiful, responsive UI which works equally well on desktop and on mobile. Gently animated for a snappy and modern feeling without ever being obtrusive or in the way. Easy theming with DaisyUI and media-queries to respect the users wish for a light or dark theme.
+<img src="images/current_session.png" alt="current_session" width="500">
 
-### :t-rex: Low Memory Footprint and Easy Customization by Courtesy of SvelteKit
+### 📈 Statistics
 
-SvelteKit is ideally suited to be served from constrained devices like an ESP32. It's unique approach leads to very slim files. No bloatware like other popular JS frameworks. Not only the low memory footprint make it ideal but the developer experience is also outstanding letting you customize the front end with ease. Adapt and add functionality as you need it. The back end has you covered as well.
+<img src="images/stats_and_charts.png" alt="current_session" width="500">
 
-### :telephone: Rich Communication Interfaces
+<!-- ### 🛠️ Documentation -->
 
-Comes with a rich set of communication interfaces to cover most standard needs of an IoT application. Like MQTT client, HTTP RESTful API, a WebSocket based Event Socket and a classic Websocket Server. All communication channels are stateful and fully synchronized. Changes propagate and are communicated to all other participants. The states can be persisted on the file system as well. For accurate time keeping time can by synchronized over NTP.
+## 🔮 Getting started
 
-### :file_cabinet: WiFi Provisioning and Management
+1. Clone and open the new project
 
-Naturally ESP32 SvelteKit comes with rich features to manage all your WiFi needs. From pulling up an access point for provisioning or as fall back, to fully manage your WiFi networks. Scan for available networks and connect to them. Advanced configuration options like static IP are on board as well.
+   ```sh
+   git clone https://github.com/runeharlyk/hamster-pedometer
+   ```
 
-### :old_key: Secured API and User Management
+1. Install dependencies with preferable package manager (npm, pnpm, yarn)
 
-Manage different user of your app with two authorization levels. An administrator and a guest user. Authenticate their API calls with a JWT token. Manage the user's profile from the admin interface. Use at own risk, as it is neither secure without the ability to use TLS/SSL encryption on the ESP32 server, nor very convenient, as only an admin can change passwords.
+   ```sh
+   cd app
+   pnpm install
+   ```
 
-### :airplane: OTA Upgrade Service
+1. Configure device settings
 
-The framework can provide two different channels for Over-the-Air updates. Either by uploading a \*.bin file from the web interface. Or by pulling a firmware image from an update server. This is implemented with the github release page as an example. It is even possible to have different build environments at the same time and the Github OTA process pulls the correct binary.
+   1. Update `factory_settings.ini` with relevant settings
 
-### :building_construction: Automated Build Chain
+1. Upload filesystem image using platformIO
 
-The automated build chain takes out the pain and tears of getting all the bits and pieces play nice together. The repository contains a PlatformIO project at its heart. A SvelteKit project for the frontend code and a mkdocs project for the documentation go alongside. The PlatformIO build tools not only build the SvelteKit frontend with Vite, but also ensure that the build results are gzipped and find their way into the flash memory of the ESP32. You have two choices to serve the frontend either from the flash partition, or embedded into the firmware binary. The latter is much more friendly if your frontend code should be distributed OTA as well, leaving all configuration files intact.
+1. Upload firmware using platformIO
 
-### :icecream: Compatible with all ESP32 Flavours
+## 🚀 Future
 
-The code runs on many variants of the ESP32 chip family. From the plain old ESP32, the ESP32-S3 and ESP32-C3. Other ESP32 variants might work, but haven't been tested. Sorry, no support for the older ESP8266. Go with one of the ESP32's instead.
+See the [open issues](https://github.com/runeharlyk/hamster-pedometer/issues) for full list of proposed and active features (and known issues).
 
-## Visit the Project Site
+## 🙌 Credits
 
-[https://theelims.github.io/ESP32-sveltekit/](https://theelims.github.io/ESP32-sveltekit/)
+This project takes great inspiration from the following resources:
 
-## Libraries Used
+1. [Spot Micro - Leika](https://github.com/runeharlyk/SpotMicroESP32-Leika)
 
-- [SvelteKit](https://kit.svelte.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [DaisyUI](https://daisyui.com/)
-- [tabler ICONS](https://tabler-icons.io/)
-- [unplugin-icons](https://github.com/antfu/unplugin-icons)
-- [svelte-modals](https://svelte-modals.mattjennings.io/)
-- [svelte-dnd-list](https://github.com/tarb/svelte-dnd-list)
-- [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
-- [PsychicHttp](https://github.com/hoeken/PsychicHttp)
-- [PsychicMqttClient](https://github.com/theelims/PsychicMqttClient)
+## ☕ Support
 
-## Licensing
+If you like the project and want to follow it evolving concidering ✨-ing the project
 
-ESP32 SvelteKit is distributed with two licenses for different sections of the code. The back end code inherits the GNU LESSER GENERAL PUBLIC LICENSE Version 3 and is therefore distributed with said license. The front end code is distributed under the MIT License. See the [LICENSE](LICENSE) for a full text of both licenses.
+<a href="https://bmc.link/runeharlyk" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
+<!-- ## You may also like... -->
+
+## 📃 License
+
+[MIT](LICENSE.md)
+
+---
+
+> [runeharlyk.dk](https://runeharlyk.dk) &nbsp;&middot;&nbsp;
+> GitHub [@runeharlyk](https://github.com/runeharlyk) &nbsp;&middot;&nbsp;
+> LinkedIn [@Rune Harlyk](https://www.linkedin.com/in/rune-harlyk/)
