@@ -1,3 +1,12 @@
+export type Session = {
+	start: number;
+	end: number;
+	steps: number;
+	times: number[];
+};
+
+export type Sessions = Session[];
+
 export type WifiStatus = {
 	status: number;
 	local_ip: string;

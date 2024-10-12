@@ -8,6 +8,9 @@
 	import Stat from '$lib/components/daisy/Stat.svelte';
 	import ResponsiveStats from '$lib/components/daisy/ResponsiveStats.svelte';
 	import { formatTime, utcToHHMM } from '$lib/utilities/string-utilities';
+	import type { Session, Sessions } from '$lib/types/models';
+	import RunningChart from './runningChart.svelte';
+	import RunningChartAccumulation from './runningChartAccumulation.svelte';
 
 	let isLoading = true;
 
@@ -36,15 +39,6 @@
 	const diameterOfHamsterWheel = 0.19;
 	const numberOfMagnets = 1;
 	const circumference = (Math.PI * diameterOfHamsterWheel) / numberOfMagnets;
-
-	type Session = {
-		start: number;
-		end: number;
-		steps: number;
-		times: number[];
-	};
-
-	type Sessions = Session[];
 
 	let sessions: Sessions;
 
@@ -95,7 +89,7 @@
 		totalTimeInWheel = sum(
 			sessions.map((sess) => {
 				if (sess.end < 1700000000 || sess.start < 1700000000) return 0;
-				return sess.end - sess.start;
+				return sess.end - sess.start - sess.times[0];
 			})
 		);
 	};
@@ -197,5 +191,8 @@
 				<span slot="desc">↗︎</span>
 			</Stat>
 		</ResponsiveStats>
+
+		<RunningChart {sessions} {circumference} />
+		<RunningChartAccumulation {sessions} {circumference} />
 	{/if}
 </SettingsCard>
