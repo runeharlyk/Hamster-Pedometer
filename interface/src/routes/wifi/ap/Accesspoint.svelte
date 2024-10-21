@@ -22,7 +22,7 @@
 
 	async function getAPStatus() {
 		try {
-			const response = await fetch('/api/v1/apStatus', {
+			const response = await fetch('/api/v1/wifi/ap/status', {
 				method: 'GET',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',

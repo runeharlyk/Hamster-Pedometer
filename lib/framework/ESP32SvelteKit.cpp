@@ -27,7 +27,6 @@ ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server,
       _notificationService(&_socket),
 #if FT_ENABLED(FT_NTP)
       _ntpSettingsService(server, &ESPFS, &_securitySettingsService),
-      _ntpStatus(server, &_securitySettingsService),
 #endif
 #if FT_ENABLED(FT_UPLOAD_FIRMWARE)
       _uploadFirmwareService(server, &_securitySettingsService),
@@ -58,12 +57,10 @@ void ESP32SvelteKit::begin() {
   _wifiSettingsService.initWiFi();
 
   // SvelteKit uses a lot of handlers, so we need to increase the
-  // max_uri_handlers WWWData has 77 Endpoints, Framework has 27, and Lighstate
-  // Demo has 4
+  // max_uri_handlers WWWData has 77 Endpoints, Framework has 27
   _server->config.max_uri_handlers = _numberEndpoints;
   _server->listen(80);
 
-#ifdef EMBED_WWW
   // Serve static resources from PROGMEM
   ESP_LOGV(TAG, "Registering routes from PROGMEM static resources");
   WWWData::registerRoutes([&](const String &uri, const String &contentType,
@@ -89,22 +86,6 @@ void ESP32SvelteKit::begin() {
       _server->defaultEndpoint->setHandler(handler);
     }
   });
-#else
-  // Serve static resources from /www/
-  ESP_LOGV(TAG, "Registering routes from FS /www/ static resources");
-  _server->serveStatic("/_app/", ESPFS, "/www/_app/");
-  _server->serveStatic("/favicon.png", ESPFS, "/www/favicon.png");
-  //  Serving all other get requests with "/www/index.htm"
-  _server->onNotFound([](PsychicRequest *request) {
-    if (request->method() == HTTP_GET) {
-      PsychicFileResponse response(request, ESPFS, "/www/index.html",
-                                   "text/html");
-      return response.send();
-      // String url = "http://" + request->host() + "/index.html";
-      // request->redirect(url.c_str());
-    }
-  });
-#endif
 
   // SYSTEM
   _server->on("/api/v1/system/reset", HTTP_POST, system_service::handleReset);
@@ -120,9 +101,20 @@ void ESP32SvelteKit::begin() {
   _server->on("/api/v1/wifi/sta/status", HTTP_GET, wifi_sta::getNetworkStatus);
 
   // AP
-  _server->on("/api/wifi/ap/status", HTTP_GET, [this](PsychicRequest *request) {
-    return _apSettingsService.getStatus(request);
+  _server->on("/api/v1/wifi/ap/status", HTTP_GET, [this](PsychicRequest *r) {
+    return _apSettingsService.getStatus(r);
   });
+
+// NTP
+#if FT_ENABLED(FT_NTP)
+  _server->on("/api/v1/ntp/status", HTTP_GET, [this](PsychicRequest *r) {
+    return _ntpSettingsService.getStatus(r);
+  });
+  _server->on("/api/v1/ntp/time", HTTP_POST,
+              [this](PsychicRequest *r, JsonVariant &json) {
+                return _ntpSettingsService.handleTime(r, json);
+              });
+#endif
 
   // MISC
   _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
@@ -165,7 +157,6 @@ void ESP32SvelteKit::begin() {
 #endif
 #if FT_ENABLED(FT_NTP)
   _ntpSettingsService.begin();
-  _ntpStatus.begin();
 #endif
 #if FT_ENABLED(FT_MQTT)
   _mqttSettingsService.begin();

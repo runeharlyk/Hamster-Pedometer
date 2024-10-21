@@ -21,7 +21,7 @@
 
 	async function getNTPStatus() {
 		try {
-			const response = await fetch('/api/v1/ntpStatus', {
+			const response = await fetch('/api/v1/ntp/status', {
 				method: 'GET',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',

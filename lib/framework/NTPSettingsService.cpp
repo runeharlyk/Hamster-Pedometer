@@ -35,16 +35,55 @@ void NTPSettingsService::begin() {
                WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
 
   _httpEndpoint.begin();
-  _server->on(TIME_PATH, HTTP_POST,
-              _securityManager->wrapCallback(
-                  std::bind(&NTPSettingsService::configureTime, this,
-                            std::placeholders::_1, std::placeholders::_2),
-                  AuthenticationPredicates::IS_ADMIN));
 
   ESP_LOGV("NTPSettingsService", "Registered POST endpoint: %s", TIME_PATH);
 
   _fsPersistence.readFromFS();
   configureNTP();
+}
+
+/*
+ * Formats the time using the format provided.
+ *
+ * Uses a 25 byte buffer, large enough to fit an ISO time string with offset.
+ */
+const char *formatTime(const tm *time, const char *format) {
+  static char time_string[25];
+  strftime(time_string, sizeof(time_string), format, time);
+  return time_string;
+}
+
+const char *toUTCTimeString(const tm *time) {
+  return formatTime(time, "%FT%TZ");
+}
+
+const char *toLocalTimeString(const tm *time) {
+  return formatTime(time, "%FT%T");
+}
+
+esp_err_t NTPSettingsService::getStatus(PsychicRequest *request) {
+  PsychicJsonResponse response = PsychicJsonResponse(request, false);
+  JsonObject root = response.getRoot();
+
+  // grab the current instant in unix seconds
+  time_t now = time(nullptr);
+
+  // only provide enabled/disabled status for now
+  root["status"] = sntp_enabled() ? 1 : 0;
+
+  // the current time in UTC
+  root["utc_time"] = toUTCTimeString(gmtime(&now));
+
+  // local time with offset
+  root["local_time"] = toLocalTimeString(localtime(&now));
+
+  // the sntp server name
+  root["server"] = sntp_getservername(0);
+
+  // device uptime in seconds
+  root["uptime"] = millis() / 1000;
+
+  return response.send();
 }
 
 void NTPSettingsService::onStationModeGotIP(WiFiEvent_t event,
@@ -70,8 +109,8 @@ void NTPSettingsService::configureNTP() {
   }
 }
 
-esp_err_t NTPSettingsService::configureTime(PsychicRequest *request,
-                                            JsonVariant &json) {
+esp_err_t NTPSettingsService::handleTime(PsychicRequest *request,
+                                         JsonVariant &json) {
   if (!sntp_enabled() && json.is<JsonObject>()) {
     struct tm tm = {0};
     String timeLocal = json["local_time"];

@@ -29,7 +29,6 @@
 #include <MqttSettingsService.h>
 #include <MqttStatus.h>
 #include <NTPSettingsService.h>
-#include <NTPStatus.h>
 #include <NotificationService.h>
 #include <PedoMeter.h>
 #include <PsychicHttp.h>
@@ -39,9 +38,7 @@
 #include <WiFiSettingsService.h>
 #include <system_service.h>
 
-#ifdef EMBED_WWW
 #include <WWWData.h>
-#endif
 
 #ifndef CORS_ORIGIN
 #define CORS_ORIGIN "*"
@@ -121,7 +118,6 @@ private:
   NotificationService _notificationService;
 #if FT_ENABLED(FT_NTP)
   NTPSettingsService _ntpSettingsService;
-  NTPStatus _ntpStatus;
 #endif
 #if FT_ENABLED(FT_UPLOAD_FIRMWARE)
   UploadFirmwareService _uploadFirmwareService;

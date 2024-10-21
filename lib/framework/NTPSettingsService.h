@@ -20,7 +20,6 @@
 #include <HttpEndpoint.h>
 #include <WiFi.h>
 
-
 #include <lwip/apps/sntp.h>
 #include <time.h>
 
@@ -73,6 +72,8 @@ public:
                      SecurityManager *securityManager);
 
   void begin();
+  static esp_err_t getStatus(PsychicRequest *request);
+  static esp_err_t handleTime(PsychicRequest *request, JsonVariant &json);
 
 private:
   PsychicHttpServer *_server;
@@ -83,7 +84,6 @@ private:
   void onStationModeGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
   void onStationModeDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
   void configureNTP();
-  esp_err_t configureTime(PsychicRequest *request, JsonVariant &json);
 };
 
 #endif // end NTPSettingsService_h

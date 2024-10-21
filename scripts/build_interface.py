@@ -40,7 +40,7 @@ def find_latest_timestamp_for_app():
 
 
 def should_regenerate_output_file():
-    if not flag_exists("EMBED_WWW") or not exists(output_file):
+    if not exists(output_file):
         return True
     last_source_change = find_latest_timestamp_for_app()
     last_build = getmtime(output_file)
@@ -86,14 +86,6 @@ def build_webapp():
         raise Exception(
             "No lock-file found. Please install dependencies for interface (eg. npm install)"
         )
-
-
-def embed_webapp():
-    if flag_exists("EMBED_WWW"):
-        print("Converting interface to PROGMEM")
-        build_progmem()
-        return
-    add_app_to_filesystem()
 
 
 def build_progmem():
@@ -163,4 +155,5 @@ def add_app_to_filesystem():
 print("running: build_interface.py")
 if should_regenerate_output_file():
     build_webapp()
-    embed_webapp()
+    print("Converting interface to PROGMEM")
+    build_progmem()

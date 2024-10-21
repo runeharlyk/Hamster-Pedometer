@@ -6,19 +6,9 @@ The build process is controlled by [platformio.ini](https://github.com/theelims/
 
 This project uses NPM as the default package manager. However, many users might have different preferences and like to use YARN or PNPM instead. Just switch the interface to one of the other package managers. The build script identify the package manager by the presence of its lock-file and start the vite build process accordingly.
 
-## Serving from Flash or Embedding into the Binary
-
-The front end website can be served either from the LITTLEFS partition of the flash, or embedded into the firmware binary (default). Later has the advantage that only one binary needs to be distributed easing the OTA process. Further more this is desirable if you like to preserve the settings stored in the LITTLEFS partition, or have other files there that need to survive a firmware update. To serve from the LITTLEFS partition instead please comment the following build flag out:
-
-```ini
-build_flags =
-    ...
-    -D EMBED_WWW
-```
-
 ### Partitioning
 
-If you choose to embed the frontend it becomes part of the firmware binary (default). As many ESP32 modules only come with 4MB built-in flash this results in the binary being too large for the reserved flash. Therefor a partition scheme with a larger section for the executable code is selected. However, this limits the LITTLEFS partition to 200kb. There are a great number of [default partition tables](https://github.com/espressif/arduino-esp32/tree/master/tools/partitions) for Arduino-ESP32 to choose from. If you have 8MB or 16MB flash this would be your first choice. If you don't need OTA you can choose a partition scheme without OTA.
+As many ESP32 modules only come with 4MB built-in flash this results in the binary being too large for the reserved flash. Therefor a partition scheme with a larger section for the executable code is selected. However, this limits the LITTLEFS partition to 200kb. There are a great number of [default partition tables](https://github.com/espressif/arduino-esp32/tree/master/tools/partitions) for Arduino-ESP32 to choose from. If you have 8MB or 16MB flash this would be your first choice. If you don't need OTA you can choose a partition scheme without OTA.
 
 Should you want to deploy the frontend from the flash's LITTLEFS partition on a 4MB chip you need to comment out the following two lines. Otherwise the 200kb will not be large enough to host the front end code.
 
