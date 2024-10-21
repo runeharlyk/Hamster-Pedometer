@@ -14,7 +14,7 @@
 	import ThemeController from '$lib/components/daisy/ThemeController.svelte';
 
 	async function postSleep() {
-		const response = await fetch('/rest/sleep', {
+		const response = await fetch('/api/v1/system/sleep', {
 			method: 'POST',
 			headers: {
 				Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic'

@@ -19,6 +19,10 @@ const config: UserConfig = {
 				target: 'http://hamster-pedometer.local/',
 				changeOrigin: true
 			},
+			'/api': {
+				target: 'http://hamster-pedometer.local/',
+				changeOrigin: true
+			},
 			// Proxying websockets ws://localhost:5173/ws -> ws://192.168.1.83/ws
 			'/ws': {
 				target: 'http://hamster-pedometer.local/',

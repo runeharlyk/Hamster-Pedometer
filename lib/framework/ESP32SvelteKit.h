@@ -26,7 +26,6 @@
 #include <ESPFS.h>
 #include <ESPmDNS.h>
 #include <EventSocket.h>
-#include <FactoryResetService.h>
 #include <FeaturesService.h>
 #include <MqttSettingsService.h>
 #include <MqttStatus.h>
@@ -35,15 +34,13 @@
 #include <NotificationService.h>
 #include <PedoMeter.h>
 #include <PsychicHttp.h>
-#include <RestartService.h>
 #include <SecuritySettingsService.h>
-#include <SleepService.h>
-#include <SystemStatus.h>
 #include <UploadFirmwareService.h>
 #include <WiFi.h>
 #include <WiFiScanner.h>
 #include <WiFiSettingsService.h>
 #include <WiFiStatus.h>
+#include <system_service.h>
 
 #ifdef EMBED_WWW
 #include <WWWData.h>
@@ -59,10 +56,6 @@
 
 #ifndef APP_NAME
 #define APP_NAME "ESP32 SvelteKit Demo"
-#endif
-
-#ifndef ESP32SVELTEKIT_RUNNING_CORE
-#define ESP32SVELTEKIT_RUNNING_CORE -1
 #endif
 
 class ESP32SvelteKit {
@@ -113,17 +106,11 @@ public:
   }
 #endif
 
-#if FT_ENABLED(FT_SLEEP)
-  SleepService *getSleepService() { return &_sleepService; }
-#endif
-
 #if FT_ENABLED(FT_BATTERY)
   BatteryService *getBatteryService() { return &_batteryService; }
 #endif
 
   FeaturesService *getFeatureService() { return &_featureService; }
-
-  void factoryReset() { _factoryResetService.factoryReset(); }
 
   void setMDNSAppName(String name) { _appName = name; }
 
@@ -158,18 +145,12 @@ private:
 #if FT_ENABLED(FT_SECURITY)
   AuthenticationService _authenticationService;
 #endif
-#if FT_ENABLED(FT_SLEEP)
-  SleepService _sleepService;
-#endif
 #if FT_ENABLED(FT_BATTERY)
   BatteryService _batteryService;
 #endif
 #if FT_ENABLED(FT_ANALYTICS)
   AnalyticsService _analyticsService;
 #endif
-  RestartService _restartService;
-  FactoryResetService _factoryResetService;
-  SystemStatus _systemStatus;
   PedoMeter _pedoMeter;
 
   String _appName = APP_NAME;

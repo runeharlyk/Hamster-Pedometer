@@ -14,6 +14,8 @@
 
 #include <ESP32SvelteKit.h>
 
+static const char *TAG = "ESP32SvelteKit";
+
 ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server,
                                unsigned int numberEndpoints)
     : _server(server), _numberEndpoints(numberEndpoints),
@@ -43,19 +45,13 @@ ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server,
 #if FT_ENABLED(FT_SECURITY)
       _authenticationService(server, &_securitySettingsService),
 #endif
-#if FT_ENABLED(FT_SLEEP)
-      _sleepService(server, &_securitySettingsService),
-#endif
 #if FT_ENABLED(FT_BATTERY)
       _batteryService(&_socket),
 #endif
 #if FT_ENABLED(FT_ANALYTICS)
       _analyticsService(&_socket),
 #endif
-      _pedoMeter(server, &ESPFS, &_securitySettingsService, &_socket),
-      _restartService(server, &_securitySettingsService),
-      _factoryResetService(server, &ESPFS, &_securitySettingsService),
-      _systemStatus(server, &_securitySettingsService) {
+      _pedoMeter(server, &ESPFS, &_securitySettingsService, &_socket) {
 }
 
 void ESP32SvelteKit::begin() {
@@ -72,8 +68,7 @@ void ESP32SvelteKit::begin() {
 
 #ifdef EMBED_WWW
   // Serve static resources from PROGMEM
-  ESP_LOGV("ESP32SvelteKit",
-           "Registering routes from PROGMEM static resources");
+  ESP_LOGV(TAG, "Registering routes from PROGMEM static resources");
   WWWData::registerRoutes([&](const String &uri, const String &contentType,
                               const uint8_t *content, size_t len) {
     PsychicHttpRequestCallback requestHandler = [contentType, content,
@@ -99,8 +94,7 @@ void ESP32SvelteKit::begin() {
   });
 #else
   // Serve static resources from /www/
-  ESP_LOGV("ESP32SvelteKit",
-           "Registering routes from FS /www/ static resources");
+  ESP_LOGV(TAG, "Registering routes from FS /www/ static resources");
   _server->serveStatic("/_app/", ESPFS, "/www/_app/");
   _server->serveStatic("/favicon.png", ESPFS, "/www/favicon.png");
   //  Serving all other get requests with "/www/index.htm"
@@ -115,13 +109,20 @@ void ESP32SvelteKit::begin() {
   });
 #endif
 
+  _server->on("/api/v1/system/reset", HTTP_POST, system_service::handleReset);
+  _server->on("/api/v1/system/restart", HTTP_POST,
+              system_service::handleRestart);
+  _server->on("/api/v1/system/sleep", HTTP_POST, system_service::handleSleep);
+  _server->on("/api/v1/system/status", HTTP_GET, system_service::getStatus);
+  _server->on("/api/v1/system/metrics", HTTP_POST, system_service::getMetrics);
+
   // Serve static resources from /config/ if set by platformio.ini
 #if SERVE_CONFIG_FILES
   _server->serveStatic("/config/", ESPFS, "/config/");
 #endif
 
 #if defined(ENABLE_CORS)
-  ESP_LOGV("ESP32SvelteKit", "Enabling CORS headers");
+  ESP_LOGV(TAG, "Enabling CORS headers");
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin",
                                        CORS_ORIGIN);
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers",
@@ -137,19 +138,14 @@ void ESP32SvelteKit::begin() {
   MDNS.addService("ws", "tcp", 80);
   MDNS.addServiceTxt("http", "tcp", "Firmware Version", APP_VERSION);
 
-#ifdef SERIAL_INFO
-  Serial.printf("Running Firmware Version: %s\n", APP_VERSION);
-#endif
+  ESP_LOGI(TAG, "Running Firmware Version: %s\n", APP_VERSION);
 
   // Start the services
   _apStatus.begin();
   _socket.begin();
   _notificationService.begin();
   _apSettingsService.begin();
-  _factoryResetService.begin();
   _featureService.begin();
-  _restartService.begin();
-  _systemStatus.begin();
   _wifiSettingsService.begin();
   _wifiScanner.begin();
   _wifiStatus.begin();
@@ -175,24 +171,21 @@ void ESP32SvelteKit::begin() {
 #if FT_ENABLED(FT_ANALYTICS)
   _analyticsService.begin();
 #endif
-#if FT_ENABLED(FT_SLEEP)
-  _sleepService.begin();
-#endif
 #if FT_ENABLED(FT_BATTERY)
   _batteryService.begin();
 #endif
   _pedoMeter.begin();
 
   // Start the loop task
-  ESP_LOGV("ESP32SvelteKit", "Starting loop task");
+  ESP_LOGV(TAG, "Starting loop task");
   xTaskCreatePinnedToCore(
-      this->_loopImpl,            // Function that should be called
-      "ESP32 SvelteKit Loop",     // Name of the task (for debugging)
-      4096,                       // Stack size (bytes)
-      this,                       // Pass reference to this class instance
-      (tskIDLE_PRIORITY + 1),     // task priority
-      NULL,                       // Task handle
-      ESP32SVELTEKIT_RUNNING_CORE // Pin to application core
+      this->_loopImpl,        // Function that should be called
+      "ESP32 SvelteKit Loop", // Name of the task (for debugging)
+      4096,                   // Stack size (bytes)
+      this,                   // Pass reference to this class instance
+      (tskIDLE_PRIORITY + 1), // task priority
+      NULL,                   // Task handle
+      0                       // Pin to application core
   );
 }
 
