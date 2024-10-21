@@ -37,9 +37,7 @@
 #include <SecuritySettingsService.h>
 #include <UploadFirmwareService.h>
 #include <WiFi.h>
-#include <WiFiScanner.h>
 #include <WiFiSettingsService.h>
-#include <WiFiStatus.h>
 #include <system_service.h>
 
 #ifdef EMBED_WWW
@@ -119,8 +117,6 @@ private:
   unsigned int _numberEndpoints;
   SecuritySettingsService _securitySettingsService;
   WiFiSettingsService _wifiSettingsService;
-  WiFiScanner _wifiScanner;
-  WiFiStatus _wifiStatus;
   APSettingsService _apSettingsService;
   APStatus _apStatus;
   EventSocket _socket;

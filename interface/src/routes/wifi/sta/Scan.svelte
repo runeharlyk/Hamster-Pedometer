@@ -36,7 +36,7 @@
 
 	async function scanNetworks() {
 		scanActive = true;
-		const scan = await fetch('/api/v1/scanNetworks', {
+		const scan = await fetch('/api/v1/wifi/scan', {
 			method: 'GET',
 			headers: {
 				Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
@@ -50,7 +50,7 @@
 	}
 
 	async function pollingResults() {
-		const response = await fetch('/api/v1/listNetworks', {
+		const response = await fetch('/api/v1/wifi/networks', {
 			method: 'GET',
 			headers: {
 				Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',

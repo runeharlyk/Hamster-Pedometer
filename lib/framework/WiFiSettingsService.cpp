@@ -217,3 +217,70 @@ void WiFiSettingsService::onStationModeStop(WiFiEvent_t event,
     _stopping = false;
   }
 }
+
+namespace wifi_sta {
+void networks(JsonObject &root) {
+  JsonArray networks = root["networks"].to<JsonArray>();
+  int numNetworks = WiFi.scanComplete();
+  for (int i = 0; i < numNetworks; i++) {
+    JsonObject network = networks.add<JsonObject>();
+    network["rssi"] = WiFi.RSSI(i);
+    network["ssid"] = WiFi.SSID(i);
+    network["bssid"] = WiFi.BSSIDstr(i);
+    network["channel"] = WiFi.channel(i);
+    network["encryption_type"] = (uint8_t)WiFi.encryptionType(i);
+  }
+}
+
+void networkStatus(JsonObject &root) {
+  wl_status_t status = WiFi.status();
+  root["status"] = (uint8_t)status;
+  if (status == WL_CONNECTED) {
+    root["local_ip"] = WiFi.localIP().toString();
+    root["mac_address"] = WiFi.macAddress();
+    root["rssi"] = WiFi.RSSI();
+    root["ssid"] = WiFi.SSID();
+    root["bssid"] = WiFi.BSSIDstr();
+    root["channel"] = WiFi.channel();
+    root["subnet_mask"] = WiFi.subnetMask().toString();
+    root["gateway_ip"] = WiFi.gatewayIP().toString();
+    IPAddress dnsIP1 = WiFi.dnsIP(0);
+    IPAddress dnsIP2 = WiFi.dnsIP(1);
+    if (dnsIP1 != INADDR_NONE) {
+      root["dns_ip_1"] = dnsIP1.toString();
+    }
+    if (dnsIP2 != INADDR_NONE) {
+      root["dns_ip_2"] = dnsIP2.toString();
+    }
+  }
+}
+
+esp_err_t handleScan(PsychicRequest *request) {
+  if (WiFi.scanComplete() != -1) {
+    WiFi.scanDelete();
+    WiFi.scanNetworks(true);
+  }
+  return request->reply(202);
+}
+
+esp_err_t getNetworks(PsychicRequest *request) {
+  int numNetworks = WiFi.scanComplete();
+  if (numNetworks == -1)
+    return request->reply(202);
+  else if (numNetworks < -1)
+    return handleScan(request);
+
+  PsychicJsonResponse response = PsychicJsonResponse(request, false);
+  JsonObject root = response.getRoot();
+  networks(root);
+  return response.send();
+}
+
+esp_err_t getNetworkStatus(PsychicRequest *request) {
+  PsychicJsonResponse response = PsychicJsonResponse(request, false);
+  JsonObject root = response.getRoot();
+  networkStatus(root);
+  return response.send();
+}
+
+} // namespace wifi_sta

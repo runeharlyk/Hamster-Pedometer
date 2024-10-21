@@ -28,7 +28,6 @@
 #include <WiFiMulti.h>
 #include <vector>
 
-
 #ifndef FACTORY_WIFI_SSID
 #define FACTORY_WIFI_SSID ""
 #endif
@@ -192,6 +191,15 @@ public:
     return StateUpdateResult::CHANGED;
   };
 };
+
+namespace wifi_sta {
+void networks(JsonObject &root);
+void networkStatus(JsonObject &root);
+
+esp_err_t handleScan(PsychicRequest *request);
+esp_err_t getNetworks(PsychicRequest *request);
+esp_err_t getNetworkStatus(PsychicRequest *request);
+} // namespace wifi_sta
 
 class WiFiSettingsService : public StatefulService<WiFiSettings> {
 public:

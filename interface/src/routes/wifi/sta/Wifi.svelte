@@ -72,7 +72,7 @@
 
 	async function getWifiStatus() {
 		try {
-			const response = await fetch('/api/v1/wifiStatus', {
+			const response = await fetch('/api/v1/wifi/sta/status', {
 				method: 'GET',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
