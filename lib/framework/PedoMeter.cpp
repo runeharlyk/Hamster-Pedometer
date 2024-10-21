@@ -35,9 +35,9 @@ void PedoMeter::begin() {
                           "Pedometer",     // Name of the task (for debugging)
                           5120,            // Stack size (bytes)
                           this, // Pass reference to this class instance
-                          (tskIDLE_PRIORITY),         // task priority
-                          NULL,                       // Task handle
-                          ESP32SVELTEKIT_RUNNING_CORE // Pin to application core
+                          (tskIDLE_PRIORITY), // task priority
+                          NULL,               // Task handle
+                          1                   // Pin to application core
   );
 }
 
