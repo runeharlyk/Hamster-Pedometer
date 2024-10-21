@@ -69,7 +69,7 @@
 	});
 
 	const getSessions = async () => {
-		const response = await fetch('/rest/steps');
+		const response = await fetch('/api/v1/steps');
 		const json = await response.json();
 		sessions = json.sessions;
 	};

@@ -4,9 +4,9 @@
 /**
  *   ESP32 SvelteKit
  *
- *   A simple, secure and extensible framework for IoT projects for ESP32 platforms
- *   with responsive Sveltekit front-end built with TailwindCSS and DaisyUI.
- *   https://github.com/theelims/ESP32-sveltekit
+ *   A simple, secure and extensible framework for IoT projects for ESP32
+ *platforms with responsive Sveltekit front-end built with TailwindCSS and
+ *DaisyUI. https://github.com/theelims/ESP32-sveltekit
  *
  *   Copyright (C) 2018 - 2023 rjwats
  *   Copyright (C) 2023 - 2024 theelims
@@ -15,12 +15,13 @@
  *   the terms of the LGPL v3 license. See the LICENSE file for details.
  **/
 
-#include <StatefulService.h>
-#include <HttpEndpoint.h>
 #include <FSPersistence.h>
+#include <HttpEndpoint.h>
 #include <PsychicMqttClient.h>
 #include <SettingValue.h>
+#include <StatefulService.h>
 #include <WiFi.h>
+
 
 #ifndef FACTORY_MQTT_ENABLED
 #define FACTORY_MQTT_ENABLED false
@@ -59,96 +60,96 @@
 #endif
 
 #define MQTT_SETTINGS_FILE "/config/mqttSettings.json"
-#define MQTT_SETTINGS_SERVICE_PATH "/rest/mqttSettings"
+#define MQTT_SETTINGS_SERVICE_PATH "/api/v1/mqttSettings"
 
 #define MQTT_RECONNECTION_DELAY 5000
 
-class MqttSettings
-{
+class MqttSettings {
 public:
-    // host and port - if enabled
-    bool enabled;
-    String uri;
+  // host and port - if enabled
+  bool enabled;
+  String uri;
 
-    // username and password
-    String username;
-    String password;
+  // username and password
+  String username;
+  String password;
 
-    // client id settings
-    String clientId;
+  // client id settings
+  String clientId;
 
-    // connection settings
-    uint16_t keepAlive;
-    bool cleanSession;
+  // connection settings
+  uint16_t keepAlive;
+  bool cleanSession;
 
-    static void read(MqttSettings &settings, JsonObject &root)
-    {
-        root["enabled"] = settings.enabled;
-        root["uri"] = settings.uri;
-        root["username"] = settings.username;
-        root["password"] = settings.password;
-        root["client_id"] = settings.clientId;
-        root["keep_alive"] = settings.keepAlive;
-        root["clean_session"] = settings.cleanSession;
-    }
+  static void read(MqttSettings &settings, JsonObject &root) {
+    root["enabled"] = settings.enabled;
+    root["uri"] = settings.uri;
+    root["username"] = settings.username;
+    root["password"] = settings.password;
+    root["client_id"] = settings.clientId;
+    root["keep_alive"] = settings.keepAlive;
+    root["clean_session"] = settings.cleanSession;
+  }
 
-    static StateUpdateResult update(JsonObject &root, MqttSettings &settings)
-    {
-        settings.enabled = root["enabled"] | FACTORY_MQTT_ENABLED;
-        settings.uri = root["uri"] | FACTORY_MQTT_URI;
-        settings.username = root["username"] | SettingValue::format(FACTORY_MQTT_USERNAME);
-        settings.password = root["password"] | FACTORY_MQTT_PASSWORD;
-        settings.clientId = root["client_id"] | SettingValue::format(FACTORY_MQTT_CLIENT_ID);
-        settings.keepAlive = root["keep_alive"] | FACTORY_MQTT_KEEP_ALIVE;
-        settings.cleanSession = root["clean_session"] | FACTORY_MQTT_CLEAN_SESSION;
-        return StateUpdateResult::CHANGED;
-    }
+  static StateUpdateResult update(JsonObject &root, MqttSettings &settings) {
+    settings.enabled = root["enabled"] | FACTORY_MQTT_ENABLED;
+    settings.uri = root["uri"] | FACTORY_MQTT_URI;
+    settings.username =
+        root["username"] | SettingValue::format(FACTORY_MQTT_USERNAME);
+    settings.password = root["password"] | FACTORY_MQTT_PASSWORD;
+    settings.clientId =
+        root["client_id"] | SettingValue::format(FACTORY_MQTT_CLIENT_ID);
+    settings.keepAlive = root["keep_alive"] | FACTORY_MQTT_KEEP_ALIVE;
+    settings.cleanSession = root["clean_session"] | FACTORY_MQTT_CLEAN_SESSION;
+    return StateUpdateResult::CHANGED;
+  }
 };
 
-class MqttSettingsService : public StatefulService<MqttSettings>
-{
+class MqttSettingsService : public StatefulService<MqttSettings> {
 public:
-    MqttSettingsService(PsychicHttpServer *server, FS *fs, SecurityManager *securityManager);
-    ~MqttSettingsService();
+  MqttSettingsService(PsychicHttpServer *server, FS *fs,
+                      SecurityManager *securityManager);
+  ~MqttSettingsService();
 
-    void begin();
-    void loop();
-    bool isEnabled();
-    bool isConnected();
-    const char *getClientId();
-    String getLastError();
-    PsychicMqttClient *getMqttClient();
+  void begin();
+  void loop();
+  bool isEnabled();
+  bool isConnected();
+  const char *getClientId();
+  String getLastError();
+  PsychicMqttClient *getMqttClient();
 
 protected:
-    void onConfigUpdated();
+  void onConfigUpdated();
 
 private:
-    PsychicHttpServer *_server;
-    SecurityManager *_securityManager;
-    HttpEndpoint<MqttSettings> _httpEndpoint;
-    FSPersistence<MqttSettings> _fsPersistence;
+  PsychicHttpServer *_server;
+  SecurityManager *_securityManager;
+  HttpEndpoint<MqttSettings> _httpEndpoint;
+  FSPersistence<MqttSettings> _fsPersistence;
 
-    // Pointers to hold retained copies of the mqtt client connection strings.
-    // This is required as AsyncMqttClient holds references to the supplied connection strings.
-    char *_retainedHost;
-    char *_retainedClientId;
-    char *_retainedUsername;
-    char *_retainedPassword;
+  // Pointers to hold retained copies of the mqtt client connection strings.
+  // This is required as AsyncMqttClient holds references to the supplied
+  // connection strings.
+  char *_retainedHost;
+  char *_retainedClientId;
+  char *_retainedUsername;
+  char *_retainedPassword;
 
-    // variable to help manage connection
-    bool _reconfigureMqtt;
-    String _lastError;
+  // variable to help manage connection
+  bool _reconfigureMqtt;
+  String _lastError;
 
-    // the MQTT client instance
-    PsychicMqttClient _mqttClient;
+  // the MQTT client instance
+  PsychicMqttClient _mqttClient;
 
-    void onStationModeGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
-    void onStationModeDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
+  void onStationModeGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
+  void onStationModeDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
 
-    void onMqttConnect(bool sessionPresent);
-    void onMqttDisconnect(bool sessionPresent);
-    void onMqttError(esp_mqtt_error_codes_t error);
-    void configureMqtt();
+  void onMqttConnect(bool sessionPresent);
+  void onMqttDisconnect(bool sessionPresent);
+  void onMqttError(esp_mqtt_error_codes_t error);
+  void configureMqtt();
 };
 
 #endif // end MqttSettingsService_h

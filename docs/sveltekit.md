@@ -20,7 +20,7 @@ To build a website that can be served from an ESP32 `adapter-static` is used. Th
 
 ```js
 export const load = (async () => {
-	const result = await fetch('/rest/features');
+	const result = await fetch('/api/v1/features');
 	const item = await result.json();
 	return {
 		features: item,

@@ -4,9 +4,9 @@
 /**
  *   ESP32 SvelteKit
  *
- *   A simple, secure and extensible framework for IoT projects for ESP32 platforms
- *   with responsive Sveltekit front-end built with TailwindCSS and DaisyUI.
- *   https://github.com/theelims/ESP32-sveltekit
+ *   A simple, secure and extensible framework for IoT projects for ESP32
+ *platforms with responsive Sveltekit front-end built with TailwindCSS and
+ *DaisyUI. https://github.com/theelims/ESP32-sveltekit
  *
  *   Copyright (C) 2018 - 2023 rjwats
  *   Copyright (C) 2023 - 2024 theelims
@@ -17,31 +17,30 @@
 
 #include <Features.h>
 
-#include <WiFi.h>
 #include <ArduinoJson.h>
 #include <PsychicHttp.h>
+#include <WiFi.h>
 #include <vector>
 
-#define FEATURES_SERVICE_PATH "/rest/features"
 
-typedef struct
-{
-    String feature;
-    bool enabled;
+#define FEATURES_SERVICE_PATH "/api/v1/features"
+
+typedef struct {
+  String feature;
+  bool enabled;
 } UserFeature;
 
-class FeaturesService
-{
+class FeaturesService {
 public:
-    FeaturesService(PsychicHttpServer *server);
+  FeaturesService(PsychicHttpServer *server);
 
-    void begin();
+  void begin();
 
-    void addFeature(String feature, bool enabled);
+  void addFeature(String feature, bool enabled);
 
 private:
-    PsychicHttpServer *_server;
-    std::vector<UserFeature> userFeatures;
+  PsychicHttpServer *_server;
+  std::vector<UserFeature> userFeatures;
 };
 
 #endif

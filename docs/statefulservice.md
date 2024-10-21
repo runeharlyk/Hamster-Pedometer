@@ -181,7 +181,7 @@ The code below demonstrates how to extend the LightStateService class to provide
 class LightStateService : public StatefulService<LightState> {
  public:
   LightStateService(PsychicHttpServer* server, SecurityManager *securityManager) :
-      _httpEndpoint(LightState::read, LightState::update, this, server, "/rest/lightState", securityManager,AuthenticationPredicates::IS_AUTHENTICATED) {
+      _httpEndpoint(LightState::read, LightState::update, this, server, "/api/v1/lightState", securityManager,AuthenticationPredicates::IS_AUTHENTICATED) {
   }
 
   void begin(); {
@@ -377,7 +377,7 @@ or keep a local pointer to the `EventSocket` instance. It is possible to send `P
 
 The framework has security features to prevent unauthorized use of the device. This is driven by [SecurityManager.h](https://github.com/theelims/ESP32-sveltekit/blob/main/lib/framework/SecurityManager.h).
 
-On successful authentication, the /rest/signIn endpoint issues a [JSON Web Token (JWT)](https://jwt.io/) which is then sent using Bearer Authentication. For this add an `Authorization`-Header to the request with the Content `Bearer {JWT-Secret}`. The framework come with built-in predicates for verifying a users access privileges. The built in AuthenticationPredicates can be found in [SecurityManager.h](https://github.com/theelims/ESP32-sveltekit/blob/main/lib/framework/SecurityManager.h) and are as follows:
+On successful authentication, the /api/v1/signIn endpoint issues a [JSON Web Token (JWT)](https://jwt.io/) which is then sent using Bearer Authentication. For this add an `Authorization`-Header to the request with the Content `Bearer {JWT-Secret}`. The framework come with built-in predicates for verifying a users access privileges. The built in AuthenticationPredicates can be found in [SecurityManager.h](https://github.com/theelims/ESP32-sveltekit/blob/main/lib/framework/SecurityManager.h) and are as follows:
 
 | Predicate        | Description                                   |
 | ---------------- | --------------------------------------------- |
@@ -388,7 +388,7 @@ On successful authentication, the /rest/signIn endpoint issues a [JSON Web Token
 You can use the security manager to wrap any request handler function with an authentication predicate:
 
 ```cpp
-server->on("/rest/someService", HTTP_GET,
+server->on("/api/v1/someService", HTTP_GET,
   _securityManager->wrapRequest(std::bind(&SomeService::someService, this, std::placeholders::_1), AuthenticationPredicates::IS_AUTHENTICATED)
 );
 ```

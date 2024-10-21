@@ -101,8 +101,8 @@ The [vite.config.ts](https://github.com/theelims/ESP32-sveltekit/blob/main/inter
 
 ```ts
 proxy: {
-    // Proxying REST: http://localhost:5173/rest/bar -> http://192.168.1.83/rest/bar
-    '/rest': {
+    // Proxying REST: http://localhost:5173/api/v1/bar -> http://192.168.1.83/api/v1/bar
+    '/api/v1': {
     target: 'http://192.168.1.83',
     changeOrigin: true,
     },

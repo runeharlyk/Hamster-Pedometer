@@ -3,9 +3,9 @@
 /**
  *   ESP32 SvelteKit
  *
- *   A simple, secure and extensible framework for IoT projects for ESP32 platforms
- *   with responsive Sveltekit front-end built with TailwindCSS and DaisyUI.
- *   https://github.com/theelims/ESP32-sveltekit
+ *   A simple, secure and extensible framework for IoT projects for ESP32
+ *platforms with responsive Sveltekit front-end built with TailwindCSS and
+ *DaisyUI. https://github.com/theelims/ESP32-sveltekit
  *
  *   Copyright (C) 2018 - 2023 rjwats
  *   Copyright (C) 2023 - 2024 theelims
@@ -16,30 +16,32 @@
 
 #include <Arduino.h>
 
-#include <WiFi.h>
 #include <ArduinoJson.h>
 #include <EventSocket.h>
 #include <PsychicHttp.h>
 #include <SecurityManager.h>
+#include <WiFi.h>
+
 
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 // #include <SSLCertBundle.h>
 
-#define GITHUB_FIRMWARE_PATH "/rest/downloadUpdate"
+#define GITHUB_FIRMWARE_PATH "/api/v1/downloadUpdate"
 #define EVENT_DOWNLOAD_OTA "otastatus"
 #define OTA_TASK_STACK_SIZE 9216
 
-class DownloadFirmwareService
-{
+class DownloadFirmwareService {
 public:
-    DownloadFirmwareService(PsychicHttpServer *server, SecurityManager *securityManager, EventSocket *socket);
+  DownloadFirmwareService(PsychicHttpServer *server,
+                          SecurityManager *securityManager,
+                          EventSocket *socket);
 
-    void begin();
+  void begin();
 
 private:
-    SecurityManager *_securityManager;
-    PsychicHttpServer *_server;
-    EventSocket *_socket;
-    esp_err_t downloadUpdate(PsychicRequest *request, JsonVariant &json);
+  SecurityManager *_securityManager;
+  PsychicHttpServer *_server;
+  EventSocket *_socket;
+  esp_err_t downloadUpdate(PsychicRequest *request, JsonVariant &json);
 };

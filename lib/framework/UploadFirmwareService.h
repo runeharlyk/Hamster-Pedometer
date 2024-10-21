@@ -24,7 +24,7 @@
 #include <SecurityManager.h>
 #include <system_service.h>
 
-#define UPLOAD_FIRMWARE_PATH "/rest/uploadFirmware"
+#define UPLOAD_FIRMWARE_PATH "/api/v1/uploadFirmware"
 
 enum FileType { ft_none = 0, ft_firmware = 1, ft_md5 = 2 };
 

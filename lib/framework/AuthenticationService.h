@@ -4,9 +4,9 @@
 /**
  *   ESP32 SvelteKit
  *
- *   A simple, secure and extensible framework for IoT projects for ESP32 platforms
- *   with responsive Sveltekit front-end built with TailwindCSS and DaisyUI.
- *   https://github.com/theelims/ESP32-sveltekit
+ *   A simple, secure and extensible framework for IoT projects for ESP32
+ *platforms with responsive Sveltekit front-end built with TailwindCSS and
+ *DaisyUI. https://github.com/theelims/ESP32-sveltekit
  *
  *   Copyright (C) 2018 - 2023 rjwats
  *   Copyright (C) 2023 - 2024 theelims
@@ -19,21 +19,21 @@
 #include <PsychicHttp.h>
 #include <SecurityManager.h>
 
-#define VERIFY_AUTHORIZATION_PATH "/rest/verifyAuthorization"
-#define SIGN_IN_PATH "/rest/signIn"
+#define VERIFY_AUTHORIZATION_PATH "/api/v1/verifyAuthorization"
+#define SIGN_IN_PATH "/api/v1/signIn"
 
 #if FT_ENABLED(FT_SECURITY)
 
-class AuthenticationService
-{
+class AuthenticationService {
 public:
-    AuthenticationService(PsychicHttpServer *server, SecurityManager *securityManager);
+  AuthenticationService(PsychicHttpServer *server,
+                        SecurityManager *securityManager);
 
-    void begin();
+  void begin();
 
 private:
-    SecurityManager *_securityManager;
-    PsychicHttpServer *_server;
+  SecurityManager *_securityManager;
+  PsychicHttpServer *_server;
 };
 
 #endif // end FT_ENABLED(FT_SECURITY)

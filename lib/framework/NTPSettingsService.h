@@ -4,9 +4,9 @@
 /**
  *   ESP32 SvelteKit
  *
- *   A simple, secure and extensible framework for IoT projects for ESP32 platforms
- *   with responsive Sveltekit front-end built with TailwindCSS and DaisyUI.
- *   https://github.com/theelims/ESP32-sveltekit
+ *   A simple, secure and extensible framework for IoT projects for ESP32
+ *platforms with responsive Sveltekit front-end built with TailwindCSS and
+ *DaisyUI. https://github.com/theelims/ESP32-sveltekit
  *
  *   Copyright (C) 2018 - 2023 rjwats
  *   Copyright (C) 2023 - 2024 theelims
@@ -15,12 +15,14 @@
  *   the terms of the LGPL v3 license. See the LICENSE file for details.
  **/
 
-#include <HttpEndpoint.h>
 #include <FSPersistence.h>
+#include <HttpEndpoint.h>
 #include <WiFi.h>
 
-#include <time.h>
+
 #include <lwip/apps/sntp.h>
+#include <time.h>
+
 
 #ifndef FACTORY_NTP_ENABLED
 #define FACTORY_NTP_ENABLED true
@@ -39,53 +41,50 @@
 #endif
 
 #define NTP_SETTINGS_FILE "/config/ntpSettings.json"
-#define NTP_SETTINGS_SERVICE_PATH "/rest/ntpSettings"
+#define NTP_SETTINGS_SERVICE_PATH "/api/v1/ntpSettings"
 
-#define TIME_PATH "/rest/time"
+#define TIME_PATH "/api/v1/time"
 
-class NTPSettings
-{
+class NTPSettings {
 public:
-    bool enabled;
-    String tzLabel;
-    String tzFormat;
-    String server;
+  bool enabled;
+  String tzLabel;
+  String tzFormat;
+  String server;
 
-    static void read(NTPSettings &settings, JsonObject &root)
-    {
-        root["enabled"] = settings.enabled;
-        root["server"] = settings.server;
-        root["tz_label"] = settings.tzLabel;
-        root["tz_format"] = settings.tzFormat;
-    }
+  static void read(NTPSettings &settings, JsonObject &root) {
+    root["enabled"] = settings.enabled;
+    root["server"] = settings.server;
+    root["tz_label"] = settings.tzLabel;
+    root["tz_format"] = settings.tzFormat;
+  }
 
-    static StateUpdateResult update(JsonObject &root, NTPSettings &settings)
-    {
-        settings.enabled = root["enabled"] | FACTORY_NTP_ENABLED;
-        settings.server = root["server"] | FACTORY_NTP_SERVER;
-        settings.tzLabel = root["tz_label"] | FACTORY_NTP_TIME_ZONE_LABEL;
-        settings.tzFormat = root["tz_format"] | FACTORY_NTP_TIME_ZONE_FORMAT;
-        return StateUpdateResult::CHANGED;
-    }
+  static StateUpdateResult update(JsonObject &root, NTPSettings &settings) {
+    settings.enabled = root["enabled"] | FACTORY_NTP_ENABLED;
+    settings.server = root["server"] | FACTORY_NTP_SERVER;
+    settings.tzLabel = root["tz_label"] | FACTORY_NTP_TIME_ZONE_LABEL;
+    settings.tzFormat = root["tz_format"] | FACTORY_NTP_TIME_ZONE_FORMAT;
+    return StateUpdateResult::CHANGED;
+  }
 };
 
-class NTPSettingsService : public StatefulService<NTPSettings>
-{
+class NTPSettingsService : public StatefulService<NTPSettings> {
 public:
-    NTPSettingsService(PsychicHttpServer *server, FS *fs, SecurityManager *securityManager);
+  NTPSettingsService(PsychicHttpServer *server, FS *fs,
+                     SecurityManager *securityManager);
 
-    void begin();
+  void begin();
 
 private:
-    PsychicHttpServer *_server;
-    SecurityManager *_securityManager;
-    HttpEndpoint<NTPSettings> _httpEndpoint;
-    FSPersistence<NTPSettings> _fsPersistence;
+  PsychicHttpServer *_server;
+  SecurityManager *_securityManager;
+  HttpEndpoint<NTPSettings> _httpEndpoint;
+  FSPersistence<NTPSettings> _fsPersistence;
 
-    void onStationModeGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
-    void onStationModeDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
-    void configureNTP();
-    esp_err_t configureTime(PsychicRequest *request, JsonVariant &json);
+  void onStationModeGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
+  void onStationModeDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
+  void configureNTP();
+  esp_err_t configureTime(PsychicRequest *request, JsonVariant &json);
 };
 
 #endif // end NTPSettingsService_h

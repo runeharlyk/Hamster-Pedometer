@@ -4,9 +4,9 @@
 /**
  *   ESP32 SvelteKit
  *
- *   A simple, secure and extensible framework for IoT projects for ESP32 platforms
- *   with responsive Sveltekit front-end built with TailwindCSS and DaisyUI.
- *   https://github.com/theelims/ESP32-sveltekit
+ *   A simple, secure and extensible framework for IoT projects for ESP32
+ *platforms with responsive Sveltekit front-end built with TailwindCSS and
+ *DaisyUI. https://github.com/theelims/ESP32-sveltekit
  *
  *   Copyright (C) 2018 - 2023 rjwats
  *   Copyright (C) 2023 - 2024 theelims
@@ -17,26 +17,27 @@
 
 #include <WiFi.h>
 
-#include <ArduinoJson.h>
-#include <PsychicHttp.h>
-#include <IPAddress.h>
-#include <SecurityManager.h>
 #include <APSettingsService.h>
+#include <ArduinoJson.h>
+#include <IPAddress.h>
+#include <PsychicHttp.h>
+#include <SecurityManager.h>
 
-#define AP_STATUS_SERVICE_PATH "/rest/apStatus"
 
-class APStatus
-{
+#define AP_STATUS_SERVICE_PATH "/api/v1/apStatus"
+
+class APStatus {
 public:
-    APStatus(PsychicHttpServer *server, SecurityManager *securityManager, APSettingsService *apSettingsService);
+  APStatus(PsychicHttpServer *server, SecurityManager *securityManager,
+           APSettingsService *apSettingsService);
 
-    void begin();
+  void begin();
 
 private:
-    PsychicHttpServer *_server;
-    SecurityManager *_securityManager;
-    APSettingsService *_apSettingsService;
-    esp_err_t apStatus(PsychicRequest *request);
+  PsychicHttpServer *_server;
+  SecurityManager *_securityManager;
+  APSettingsService *_apSettingsService;
+  esp_err_t apStatus(PsychicRequest *request);
 };
 
 #endif // end APStatus_h

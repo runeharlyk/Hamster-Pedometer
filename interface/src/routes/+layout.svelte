@@ -62,7 +62,7 @@
 
 	async function validateUser(userdata: userProfile) {
 		try {
-			const response = await fetch('/rest/verifyAuthorization', {
+			const response = await fetch('/api/v1/verifyAuthorization', {
 				method: 'GET',
 				headers: {
 					Authorization: 'Bearer ' + userdata.bearer_token,

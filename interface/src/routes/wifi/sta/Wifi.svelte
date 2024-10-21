@@ -72,7 +72,7 @@
 
 	async function getWifiStatus() {
 		try {
-			const response = await fetch('/rest/wifiStatus', {
+			const response = await fetch('/api/v1/wifiStatus', {
 				method: 'GET',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
@@ -88,7 +88,7 @@
 
 	async function getWifiSettings() {
 		try {
-			const response = await fetch('/rest/wifiSettings', {
+			const response = await fetch('/api/v1/wifiSettings', {
 				method: 'GET',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
@@ -111,7 +111,7 @@
 
 	async function postWiFiSettings(data: WifiSettings) {
 		try {
-			const response = await fetch('/rest/wifiSettings', {
+			const response = await fetch('/api/v1/wifiSettings', {
 				method: 'POST',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',

@@ -19,16 +19,13 @@
 	async function getGithubAPI() {
 		const githubUrl = `https://api.github.com/repos/${$page.data.github}/releases/latest`;
 		try {
-			const response = await fetch(
-				githubUrl,
-				{
-					method: 'GET',
-					headers: {
-						accept: 'application/vnd.github+json',
-						'X-GitHub-Api-Version': '2022-11-28'
-					}
+			const response = await fetch(githubUrl, {
+				method: 'GET',
+				headers: {
+					accept: 'application/vnd.github+json',
+					'X-GitHub-Api-Version': '2022-11-28'
 				}
-			);
+			});
 			if (response.status !== 200) {
 				throw new Error(`Failed to fetch latest release from ${githubUrl}`);
 			}
@@ -59,7 +56,7 @@
 
 	async function postGithubDownload(url: string) {
 		try {
-			const apiResponse = await fetch('/rest/downloadUpdate', {
+			const apiResponse = await fetch('/api/v1/downloadUpdate', {
 				method: 'POST',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
