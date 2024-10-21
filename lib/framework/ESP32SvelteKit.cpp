@@ -19,7 +19,7 @@ static const char *TAG = "ESP32SvelteKit";
 ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server,
                                unsigned int numberEndpoints)
     : _server(server), _numberEndpoints(numberEndpoints),
-      _featureService(server), _securitySettingsService(server, &ESPFS),
+      _securitySettingsService(server, &ESPFS),
       _wifiSettingsService(server, &ESPFS, &_securitySettingsService, &_socket),
       _wifiScanner(server, &_securitySettingsService),
       _wifiStatus(server, &_securitySettingsService),
@@ -116,6 +116,8 @@ void ESP32SvelteKit::begin() {
   _server->on("/api/v1/system/status", HTTP_GET, system_service::getStatus);
   _server->on("/api/v1/system/metrics", HTTP_POST, system_service::getMetrics);
 
+  _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
+
   // Serve static resources from /config/ if set by platformio.ini
 #if SERVE_CONFIG_FILES
   _server->serveStatic("/config/", ESPFS, "/config/");
@@ -145,7 +147,6 @@ void ESP32SvelteKit::begin() {
   _socket.begin();
   _notificationService.begin();
   _apSettingsService.begin();
-  _featureService.begin();
   _wifiSettingsService.begin();
   _wifiScanner.begin();
   _wifiStatus.begin();

@@ -110,8 +110,6 @@ public:
   BatteryService *getBatteryService() { return &_batteryService; }
 #endif
 
-  FeaturesService *getFeatureService() { return &_featureService; }
-
   void setMDNSAppName(String name) { _appName = name; }
 
   void recoveryMode() { _apSettingsService.recoveryMode(); }
@@ -119,7 +117,6 @@ public:
 private:
   PsychicHttpServer *_server;
   unsigned int _numberEndpoints;
-  FeaturesService _featureService;
   SecuritySettingsService _securitySettingsService;
   WiFiSettingsService _wifiSettingsService;
   WiFiScanner _wifiScanner;
