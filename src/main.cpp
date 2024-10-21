@@ -3,9 +3,9 @@
 
 #define SERIAL_BAUD_RATE 115200
 
-PsychicHttpServer server;
+DRAM_ATTR PsychicHttpServer server;
 
-ESP32SvelteKit esp32sveltekit(&server, 120);
+DRAM_ATTR ESP32SvelteKit esp32sveltekit(&server);
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);

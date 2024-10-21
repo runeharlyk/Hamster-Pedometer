@@ -1,25 +1,9 @@
-/**
- *   ESP32 SvelteKit
- *
- *   A simple, secure and extensible framework for IoT projects for ESP32
- *platforms with responsive Sveltekit front-end built with TailwindCSS and
- *DaisyUI. https://github.com/theelims/ESP32-sveltekit
- *
- *   Copyright (C) 2018 - 2023 rjwats
- *   Copyright (C) 2024 theelims
- *
- *   All Rights Reserved. This software may be modified and distributed under
- *   the terms of the LGPL v3 license. See the LICENSE file for details.
- **/
-
 #include <ESP32SvelteKit.h>
 
 static const char *TAG = "ESP32SvelteKit";
 
-ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server,
-                               unsigned int numberEndpoints)
-    : _server(server), _numberEndpoints(numberEndpoints),
-      _securitySettingsService(server, &ESPFS),
+ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server)
+    : _server(server), _securitySettingsService(server, &ESPFS),
       _wifiSettingsService(server, &ESPFS, &_securitySettingsService, &_socket),
       _apSettingsService(server, &ESPFS, &_securitySettingsService),
       _socket(server, &_securitySettingsService,
@@ -56,10 +40,17 @@ void ESP32SvelteKit::begin() {
 
   _wifiSettingsService.initWiFi();
 
-  // SvelteKit uses a lot of handlers, so we need to increase the
-  // max_uri_handlers WWWData has 77 Endpoints, Framework has 27
+  ESP_LOGI(TAG, "Running Firmware Version: %s\n", APP_VERSION);
+
+  setupServer();
+  setupMDNS();
+  startServices();
+}
+
+void ESP32SvelteKit::setupServer() {
   _server->config.max_uri_handlers = _numberEndpoints;
-  _server->listen(80);
+  _server->maxUploadSize = _maxFileUpload;
+  _server->listen(_port);
 
   // Serve static resources from PROGMEM
   ESP_LOGV(TAG, "Registering routes from PROGMEM static resources");
@@ -133,17 +124,18 @@ void ESP32SvelteKit::begin() {
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Credentials",
                                        "true");
 #endif
+}
 
+void ESP32SvelteKit::setupMDNS() {
   ESP_LOGV("ESP32SvelteKit", "Starting MDNS");
   MDNS.begin(_wifiSettingsService.getHostname().c_str());
   MDNS.setInstanceName(_appName);
   MDNS.addService("http", "tcp", 80);
   MDNS.addService("ws", "tcp", 80);
   MDNS.addServiceTxt("http", "tcp", "Firmware Version", APP_VERSION);
+}
 
-  ESP_LOGI(TAG, "Running Firmware Version: %s\n", APP_VERSION);
-
-  // Start the services
+void ESP32SvelteKit::startServices() {
   _socket.begin();
   _notificationService.begin();
   _apSettingsService.begin();

@@ -1,24 +1,9 @@
 #ifndef ESP32SvelteKit_h
 #define ESP32SvelteKit_h
 
-/**
- *   ESP32 SvelteKit
- *
- *   A simple, secure and extensible framework for IoT projects for ESP32
- *platforms with responsive Sveltekit front-end built with TailwindCSS and
- *DaisyUI. https://github.com/theelims/ESP32-sveltekit
- *
- *   Copyright (C) 2018 - 2023 rjwats
- *   Copyright (C) 2023 - 2024 theelims
- *
- *   All Rights Reserved. This software may be modified and distributed under
- *   the terms of the LGPL v3 license. See the LICENSE file for details.
- **/
-
-#include <Arduino.h>
-
 #include <APSettingsService.h>
 #include <AnalyticsService.h>
+#include <Arduino.h>
 #include <AuthenticationService.h>
 #include <BatteryService.h>
 #include <DownloadFirmwareService.h>
@@ -54,7 +39,7 @@
 
 class ESP32SvelteKit {
 public:
-  ESP32SvelteKit(PsychicHttpServer *server, unsigned int numberEndpoints = 115);
+  ESP32SvelteKit(PsychicHttpServer *server);
 
   void begin();
 
@@ -110,7 +95,6 @@ public:
 
 private:
   PsychicHttpServer *_server;
-  unsigned int _numberEndpoints;
   SecuritySettingsService _securitySettingsService;
   WiFiSettingsService _wifiSettingsService;
   APSettingsService _apSettingsService;
@@ -142,11 +126,18 @@ private:
 
   String _appName = APP_NAME;
 
+  const u_int16_t _numberEndpoints = 115;
+  const u_int32_t _maxFileUpload = 2300000; // 2.3 MB
+  const uint16_t _port = 80;
+
 protected:
   static void _loopImpl(void *_this) {
     static_cast<ESP32SvelteKit *>(_this)->_loop();
   }
   void _loop();
+  void setupServer();
+  void setupMDNS();
+  void startServices();
 };
 
 #endif
