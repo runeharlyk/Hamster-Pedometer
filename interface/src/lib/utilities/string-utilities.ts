@@ -16,3 +16,30 @@ export const utcToHHMM = (utc: number): string => {
 	const minutes = date.getUTCMinutes();
 	return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 };
+
+export const formatTimeRange = (startTimestamp: number, endTimestamp: number): string => {
+	const startDate = new Date(startTimestamp * 1000);
+	const endDate = endTimestamp !== 0 ? new Date(endTimestamp * 1000) : new Date();
+
+	const sameDay = startDate.toDateString() === endDate.toDateString();
+
+	const startFormatted = sameDay
+		? `${utcToHHMM(startTimestamp)}`
+		: startDate.toLocaleDateString('en-US', {
+				month: 'short',
+				day: 'numeric',
+				timeZone: 'UTC'
+			});
+
+	const endFormatted =
+		endTimestamp === 0
+			? 'now'
+			: sameDay
+				? utcToHHMM(endTimestamp)
+				: endDate.toLocaleString('en-US', {
+						month: 'short',
+						day: 'numeric',
+						timeZone: 'UTC'
+					});
+	return `${startFormatted} - ${endFormatted}`;
+};

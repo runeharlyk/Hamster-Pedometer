@@ -11,6 +11,7 @@
 	import RssiIndicator from '$lib/components/RSSIIndicator.svelte';
 	import BatteryIndicator from '$lib/components/BatteryIndicator.svelte';
 	import UpdateIndicator from '$lib/components/UpdateIndicator.svelte';
+	import ThemeController from '$lib/components/daisy/ThemeController.svelte';
 
 	async function postSleep() {
 		const response = await fetch('/rest/sleep', {
@@ -60,16 +61,6 @@
 			/>
 		{/if}
 	</div>
-
-	{#if $page.data.features.battery}
-		<div class="flex-none">
-			<BatteryIndicator
-				charging={$telemetry.battery.charging}
-				soc={$telemetry.battery.soc}
-				class="h-7 w-7"
-			/>
-		</div>
-	{/if}
 
 	{#if $page.data.features.sleep}
 		<div class="flex-none">

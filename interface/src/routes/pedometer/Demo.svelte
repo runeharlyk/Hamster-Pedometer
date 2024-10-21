@@ -7,7 +7,7 @@
 	import Hamster from '$lib/components/Hamster.svelte';
 	import Stat from '$lib/components/daisy/Stat.svelte';
 	import ResponsiveStats from '$lib/components/daisy/ResponsiveStats.svelte';
-	import { formatTime, utcToHHMM } from '$lib/utilities/string-utilities';
+	import { formatTime, formatTimeRange, utcToHHMM } from '$lib/utilities/string-utilities';
 	import type { Session, Sessions } from '$lib/types/models';
 	import RunningChart from './runningChart.svelte';
 	import RunningChartAccumulation from './runningChartAccumulation.svelte';
@@ -69,7 +69,7 @@
 	});
 
 	const getSessions = async () => {
-		const response = await fetch('rest/steps');
+		const response = await fetch('/rest/steps');
 		const json = await response.json();
 		sessions = json.sessions;
 	};
@@ -87,10 +87,12 @@
 			sum(statifiedSessions.map((sess) => sess.averagePace)) / sessions.length || 0;
 
 		totalTimeInWheel = sum(
-			sessions.map((sess) => {
-				if (sess.end < 1700000000 || sess.start < 1700000000) return 0;
-				return sess.end - sess.start - sess.times[0];
-			})
+			sessions
+				.map((sess) => {
+					if (sess.end < 1700000000 || sess.start < 1700000000) return 0;
+					return sess.end - sess.start - (sess.times[0] || 0);
+				})
+				.filter(Boolean)
 		);
 	};
 
@@ -100,7 +102,7 @@
 		const timeRunning = sum(speeds) || 0;
 		const topPace = Math.max(...speeds);
 		const averagePace = speeds.length ? timeRunning / speeds.length : 0;
-		const sessionMin = session.end - session.start;
+		const sessionMin = (session.end || new Date().getTime() / 1000) - session.start;
 		return {
 			end: session.end,
 			start: session.start,
@@ -130,6 +132,8 @@
 	};
 
 	const reset = () => socket.sendEvent('reset_pedometer', '');
+
+	const f = (val: number) => Math.max(val, 0).toFixed(1);
 </script>
 
 <SettingsCard collapsible={false}>
@@ -149,23 +153,22 @@
 			<ResponsiveStats>
 				<Stat>
 					<span slot="title">Distance</span>
-					{currentSession.distance.toFixed(1)} m
+					{f(currentSession.distance)} m
 					<span slot="desc">
-						{utcToHHMM(currentSession.start)} -
-						{currentSession.end ? utcToHHMM(currentSession.end) : 'Now'}
+						{formatTimeRange(currentSession.start, currentSession.end)}
 						({formatTime(currentSession.sessionMin)})
 					</span>
 				</Stat>
 
 				<Stat>
 					<span slot="title">Top pace</span>
-					{currentSession.topPace.toFixed(1)} m/s
+					{f(currentSession.topPace)} m/s
 					<span slot="desc">↗︎</span>
 				</Stat>
 
 				<Stat>
 					<span slot="title">Pace</span>
-					{speedMetersPerSecond.toFixed(1)} m/s
+					{f(speedMetersPerSecond)} m/s
 					<!-- <span slot="desc">↗︎</span> -->
 				</Stat>
 			</ResponsiveStats>
@@ -175,19 +178,22 @@
 		<ResponsiveStats>
 			<Stat>
 				<span slot="title">Total Distance</span>
-				{totalDistance.toFixed(1)} m
-				<span slot="desc">Oct 11th - Oct 11th ({formatTime(totalTimeInWheel)})</span>
+				{f(totalDistance)} m
+				<span slot="desc">
+					{formatTimeRange(sessions[0].start, currentSession.end)}
+					({formatTime(totalTimeInWheel)})
+				</span>
 			</Stat>
 
 			<Stat>
 				<span slot="title">Top Speed</span>
-				{allTimeTopPace.toFixed(1)} m/s
+				{f(allTimeTopPace)} m/s
 				<span slot="desc">↗︎</span>
 			</Stat>
 
 			<Stat>
 				<span slot="title">Average pace</span>
-				{allTimeAveragePace.toFixed(1)} m/s
+				{f(allTimeAveragePace)} m/s
 				<span slot="desc">↗︎</span>
 			</Stat>
 		</ResponsiveStats>
