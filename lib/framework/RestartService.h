@@ -15,31 +15,36 @@
  *   the terms of the LGPL v3 license. See the LICENSE file for details.
  **/
 
-#include <WiFi.h>
-
+#include <ESPmDNS.h>
 #include <PsychicHttp.h>
 #include <SecurityManager.h>
+#include <WiFi.h>
 
 #define RESTART_SERVICE_PATH "/rest/restart"
 
-class RestartService
-{
+class RestartService {
 public:
-    RestartService(PsychicHttpServer *server, SecurityManager *securityManager);
+  RestartService(PsychicHttpServer *server, SecurityManager *securityManager);
 
-    void begin();
+  void begin();
 
-    static void restartNow()
-    {
-        WiFi.disconnect(true);
-        delay(500);
-        ESP.restart();
-    }
+  static void restartNow() {
+    xTaskCreate(
+        [](void *pvParams) {
+          delay(1000);
+          MDNS.end();
+          delay(100);
+          WiFi.disconnect(true);
+          delay(500);
+          ESP.restart();
+        },
+        "restart task", 4096, nullptr, 10, nullptr);
+  }
 
 private:
-    PsychicHttpServer *_server;
-    SecurityManager *_securityManager;
-    esp_err_t restart(PsychicRequest *request);
+  PsychicHttpServer *_server;
+  SecurityManager *_securityManager;
+  esp_err_t restart(PsychicRequest *request);
 };
 
 #endif // end RestartService_h

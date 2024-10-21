@@ -17,78 +17,65 @@
 void (*SleepService::_callbackSleep)() = nullptr;
 
 SleepService::SleepService(PsychicHttpServer *server,
-                           SecurityManager *securityManager) : _server(server),
-                                                               _securityManager(securityManager)
-{
-}
+                           SecurityManager *securityManager)
+    : _server(server), _securityManager(securityManager) {}
 
-void SleepService::begin()
-{
+void SleepService::begin() {
 // OPTIONS (for CORS preflight)
 #ifdef ENABLE_CORS
-    _server->on(SLEEP_SERVICE_PATH,
-                HTTP_OPTIONS,
-                _securityManager->wrapRequest(
-                    [this](PsychicRequest *request)
-                    {
-                        return request->reply(200);
-                    },
-                    AuthenticationPredicates::IS_AUTHENTICATED));
+  _server->on(
+      SLEEP_SERVICE_PATH, HTTP_OPTIONS,
+      _securityManager->wrapRequest(
+          [this](PsychicRequest *request) { return request->reply(200); },
+          AuthenticationPredicates::IS_AUTHENTICATED));
 #endif
 
-    _server->on(SLEEP_SERVICE_PATH,
-                HTTP_POST,
-                _securityManager->wrapRequest(std::bind(&SleepService::sleep, this, std::placeholders::_1),
-                                              AuthenticationPredicates::IS_AUTHENTICATED));
+  _server->on(SLEEP_SERVICE_PATH, HTTP_POST,
+              _securityManager->wrapRequest(
+                  std::bind(&SleepService::sleep, this, std::placeholders::_1),
+                  AuthenticationPredicates::IS_AUTHENTICATED));
 
-    ESP_LOGV("SleepService", "Registered POST endpoint: %s", SLEEP_SERVICE_PATH);
+  ESP_LOGV("SleepService", "Registered POST endpoint: %s", SLEEP_SERVICE_PATH);
 }
 
-esp_err_t SleepService::sleep(PsychicRequest *request)
-{
-    request->reply(200);
-    sleepNow();
+esp_err_t SleepService::sleep(PsychicRequest *request) {
+  request->reply(200);
+  sleepNow();
 
-    return ESP_OK;
+  return ESP_OK;
 }
 
-void SleepService::sleepNow()
-{
-#ifdef SERIAL_INFO
-    Serial.println("Going into deep sleep now");
-#endif
-    ESP_LOGI("SleepService", "Going into deep sleep now");
-    // Callback for main code sleep preparation
-    if (_callbackSleep != nullptr)
-    {
-        _callbackSleep();
-    }
-    delay(100);
+void SleepService::sleepNow() {
+  ESP_LOGI("SleepService", "Going into deep sleep now");
+  // Callback for main code sleep preparation
+  if (_callbackSleep != nullptr) {
+    _callbackSleep();
+  }
+  delay(100);
 
-    MDNS.end();
-    delay(100);
+  MDNS.end();
+  delay(100);
 
-    WiFi.disconnect(true);
-    delay(500);
+  WiFi.disconnect(true);
+  delay(500);
 
-    // Prepare ESP for sleep
-    uint64_t bitmask = (uint64_t)1 << (WAKEUP_PIN_NUMBER);
+  // Prepare ESP for sleep
+  uint64_t bitmask = (uint64_t)1 << (WAKEUP_PIN_NUMBER);
 
 // special treatment for ESP32-C3 because of the RISC-V architecture
 #ifdef CONFIG_IDF_TARGET_ESP32C3
-    esp_deep_sleep_enable_gpio_wakeup(bitmask, (esp_deepsleep_gpio_wake_up_mode_t)WAKEUP_SIGNAL);
+  esp_deep_sleep_enable_gpio_wakeup(
+      bitmask, (esp_deepsleep_gpio_wake_up_mode_t)WAKEUP_SIGNAL);
 #else
-    esp_sleep_enable_ext1_wakeup(bitmask, (esp_sleep_ext1_wakeup_mode_t)WAKEUP_SIGNAL);
-    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
+  esp_sleep_enable_ext1_wakeup(bitmask,
+                               (esp_sleep_ext1_wakeup_mode_t)WAKEUP_SIGNAL);
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
 #endif
 
-#ifdef SERIAL_INFO
-    Serial.println("Good by!");
-#endif
-
-    // Just to be sure
-    delay(100);
-
-    // Hibernate
-    esp_deep_sleep_start();
+  xTaskCreate(
+      [](void *pvParams) {
+        delay(200);
+        esp_deep_sleep_start();
+      },
+      "sleep task", 4096, nullptr, 10, nullptr);
 }
