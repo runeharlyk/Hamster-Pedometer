@@ -59,7 +59,7 @@
 		use:focusTrap
 	>
 		<div
-			class="bg-base-100 shadow-secondary/30 rounded-box pointer-events-auto flex max-h-full min-w-fit max-w-md flex-col justify-between p-4 shadow-lg"
+			class="bg-base-100 rounded-box pointer-events-auto flex max-h-full min-w-fit max-w-md flex-col justify-between p-4 shadow-lg"
 		>
 			<h2 class="text-base-content text-start text-2xl font-bold">Updating Firmware</h2>
 			<div class="divider my-2" />

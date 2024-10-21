@@ -24,10 +24,10 @@
 		transition:fly={{ y: 50 }}
 		on:introstart
 		on:outroend
-        use:focusTrap
+		use:focusTrap
 	>
 		<div
-			class="rounded-box bg-base-100 shadow-secondary/30 pointer-events-auto flex min-w-fit max-w-md flex-col justify-between p-4 shadow-lg"
+			class="rounded-box bg-base-100 pointer-events-auto flex min-w-fit max-w-md flex-col justify-between p-4 shadow-lg"
 		>
 			<h2 class="text-base-content text-start text-2xl font-bold">{title}</h2>
 			<div class="divider my-2" />
