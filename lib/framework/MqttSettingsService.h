@@ -15,6 +15,7 @@
  *   the terms of the LGPL v3 license. See the LICENSE file for details.
  **/
 
+#include <ESPFS.h>
 #include <FSPersistence.h>
 #include <HttpEndpoint.h>
 #include <PsychicMqttClient.h>
@@ -59,7 +60,6 @@
 #define FACTORY_MQTT_MAX_TOPIC_LENGTH 128
 #endif
 
-#define MQTT_SETTINGS_FILE "/config/mqttSettings.json"
 #define MQTT_SETTINGS_SERVICE_PATH "/api/v1/mqttSettings"
 
 #define MQTT_RECONNECTION_DELAY 5000

@@ -22,7 +22,6 @@ Top stats:
 #include <timing.h>
 #include <vector>
 
-#define STEPS_FILE "/config/steps.json"
 #define STEPS_SETTINGS_SERVICE_PATH "/api/v1/steps"
 
 #define EVENT_STEP "step"

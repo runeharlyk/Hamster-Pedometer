@@ -15,6 +15,7 @@
  *   the terms of the LGPL v3 license. See the LICENSE file for details.
  **/
 
+#include <ESPFS.h>
 #include <EventSocket.h>
 #include <FSPersistence.h>
 #include <HttpEndpoint.h>
@@ -44,7 +45,6 @@
 #define FACTORY_WIFI_RSSI_THRESHOLD -80
 #endif
 
-#define WIFI_SETTINGS_FILE "/config/wifiSettings.json"
 #define WIFI_SETTINGS_SERVICE_PATH "/api/v1/wifiSettings"
 
 #define WIFI_RECONNECTION_DELAY 1000 * 30

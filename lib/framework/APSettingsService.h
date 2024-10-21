@@ -15,6 +15,7 @@
  *   the terms of the LGPL v3 license. See the LICENSE file for details.
  **/
 
+#include <ESPFS.h>
 #include <FSPersistence.h>
 #include <HttpEndpoint.h>
 #include <JsonUtils.h>
@@ -61,7 +62,6 @@
 #define FACTORY_AP_MAX_CLIENTS 4
 #endif
 
-#define AP_SETTINGS_FILE "/config/apSettings.json"
 #define AP_SETTINGS_SERVICE_PATH "/api/v1/apSettings"
 
 #define AP_MODE_ALWAYS 0

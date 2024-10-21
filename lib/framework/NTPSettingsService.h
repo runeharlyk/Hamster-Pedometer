@@ -15,6 +15,7 @@
  *   the terms of the LGPL v3 license. See the LICENSE file for details.
  **/
 
+#include <ESPFS.h>
 #include <FSPersistence.h>
 #include <HttpEndpoint.h>
 #include <WiFi.h>
@@ -22,7 +23,6 @@
 
 #include <lwip/apps/sntp.h>
 #include <time.h>
-
 
 #ifndef FACTORY_NTP_ENABLED
 #define FACTORY_NTP_ENABLED true
@@ -40,7 +40,6 @@
 #define FACTORY_NTP_SERVER "time.google.com"
 #endif
 
-#define NTP_SETTINGS_FILE "/config/ntpSettings.json"
 #define NTP_SETTINGS_SERVICE_PATH "/api/v1/ntpSettings"
 
 #define TIME_PATH "/api/v1/time"

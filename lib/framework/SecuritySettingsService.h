@@ -15,6 +15,7 @@
  *   the terms of the LGPL v3 license. See the LICENSE file for details.
  **/
 
+#include <ESPFS.h>
 #include <FSPersistence.h>
 #include <Features.h>
 #include <HttpEndpoint.h>
@@ -42,7 +43,6 @@
 #define FACTORY_GUEST_PASSWORD "guest"
 #endif
 
-#define SECURITY_SETTINGS_FILE "/config/securitySettings.json"
 #define SECURITY_SETTINGS_PATH "/api/v1/securitySettings"
 
 #define GENERATE_TOKEN_PATH "/api/v1/generateToken"
