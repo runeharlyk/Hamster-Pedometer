@@ -109,6 +109,7 @@ void ESP32SvelteKit::setupServer() {
 
   // MISC
   _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
+  _server->on("/ws/events", _socket.getHandler());
 
   // STATIC CONFIG
 #if SERVE_CONFIG_FILES
