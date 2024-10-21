@@ -113,3 +113,15 @@ APNetworkStatus APSettingsService::getAPNetworkStatus() {
   }
   return apActive ? APNetworkStatus::ACTIVE : APNetworkStatus::INACTIVE;
 }
+
+esp_err_t APSettingsService::getStatus(PsychicRequest *request) {
+  PsychicJsonResponse response = PsychicJsonResponse(request, false);
+  JsonObject root = response.getRoot();
+
+  root["status"] = getAPNetworkStatus();
+  root["ip_address"] = WiFi.softAPIP().toString();
+  root["mac_address"] = WiFi.softAPmacAddress();
+  root["station_num"] = WiFi.softAPgetStationNum();
+
+  return response.send();
+}

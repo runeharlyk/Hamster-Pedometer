@@ -22,7 +22,6 @@
 #include <SettingValue.h>
 #include <WiFi.h>
 
-
 #include <DNSServer.h>
 #include <IPAddress.h>
 
@@ -148,6 +147,8 @@ public:
   void loop();
   APNetworkStatus getAPNetworkStatus();
   void recoveryMode();
+
+  esp_err_t getStatus(PsychicRequest *request);
 
 private:
   PsychicHttpServer *_server;

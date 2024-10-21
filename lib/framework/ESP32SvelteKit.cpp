@@ -22,7 +22,6 @@ ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server,
       _securitySettingsService(server, &ESPFS),
       _wifiSettingsService(server, &ESPFS, &_securitySettingsService, &_socket),
       _apSettingsService(server, &ESPFS, &_securitySettingsService),
-      _apStatus(server, &_securitySettingsService, &_apSettingsService),
       _socket(server, &_securitySettingsService,
               AuthenticationPredicates::IS_AUTHENTICATED),
       _notificationService(&_socket),
@@ -107,6 +106,7 @@ void ESP32SvelteKit::begin() {
   });
 #endif
 
+  // SYSTEM
   _server->on("/api/v1/system/reset", HTTP_POST, system_service::handleReset);
   _server->on("/api/v1/system/restart", HTTP_POST,
               system_service::handleRestart);
@@ -114,15 +114,22 @@ void ESP32SvelteKit::begin() {
   _server->on("/api/v1/system/status", HTTP_GET, system_service::getStatus);
   _server->on("/api/v1/system/metrics", HTTP_GET, system_service::getMetrics);
 
-  _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
-
+  // WIFI
   _server->on("/api/v1/wifi/scan", HTTP_POST, wifi_sta::handleScan);
   _server->on("/api/v1/wifi/networks", HTTP_GET, wifi_sta::getNetworks);
   _server->on("/api/v1/wifi/sta/status", HTTP_GET, wifi_sta::getNetworkStatus);
 
-  // Serve static resources from /config/ if set by platformio.ini
+  // AP
+  _server->on("/api/wifi/ap/status", HTTP_GET, [this](PsychicRequest *request) {
+    return _apSettingsService.getStatus(request);
+  });
+
+  // MISC
+  _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
+
+  // STATIC CONFIG
 #if SERVE_CONFIG_FILES
-  _server->serveStatic("/config/", ESPFS, "/config/");
+  _server->serveStatic("/api/config/", ESPFS, "/config/");
 #endif
 
 #if defined(ENABLE_CORS)
@@ -145,7 +152,6 @@ void ESP32SvelteKit::begin() {
   ESP_LOGI(TAG, "Running Firmware Version: %s\n", APP_VERSION);
 
   // Start the services
-  _apStatus.begin();
   _socket.begin();
   _notificationService.begin();
   _apSettingsService.begin();

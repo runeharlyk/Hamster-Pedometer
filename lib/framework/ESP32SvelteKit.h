@@ -18,7 +18,6 @@
 #include <Arduino.h>
 
 #include <APSettingsService.h>
-#include <APStatus.h>
 #include <AnalyticsService.h>
 #include <AuthenticationService.h>
 #include <BatteryService.h>
@@ -118,7 +117,6 @@ private:
   SecuritySettingsService _securitySettingsService;
   WiFiSettingsService _wifiSettingsService;
   APSettingsService _apSettingsService;
-  APStatus _apStatus;
   EventSocket _socket;
   NotificationService _notificationService;
 #if FT_ENABLED(FT_NTP)
