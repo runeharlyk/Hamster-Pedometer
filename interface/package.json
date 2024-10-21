@@ -1,6 +1,6 @@
 {
-	"name": "ESP32-Sveltekit Template",
-	"version": "0.2.0",
+	"name": "hamster-pedometer",
+	"version": "0.0.1",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev --host",
