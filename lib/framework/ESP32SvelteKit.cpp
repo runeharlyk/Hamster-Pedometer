@@ -154,21 +154,9 @@ void ESP32SvelteKit::startServices() {
     _mqttSettingsService.begin();
     _mqttStatus.begin();
 #endif
-#if FT_ENABLED(FT_ANALYTICS)
-    _analyticsService.begin();
-#endif
     _pedoMeter.begin();
 
-    // Start the loop task
-    ESP_LOGV(TAG, "Starting loop task");
-    xTaskCreatePinnedToCore(this->_loopImpl,        // Function that should be called
-                            "ESP32 SvelteKit Loop", // Name of the task (for debugging)
-                            4096,                   // Stack size (bytes)
-                            this,                   // Pass reference to this class instance
-                            (tskIDLE_PRIORITY + 1), // task priority
-                            NULL,                   // Task handle
-                            0                       // Pin to application core
-    );
+    xTaskCreatePinnedToCore(this->_loopImpl, "ESP32 SvelteKit Loop", 4096, this, (tskIDLE_PRIORITY + 1), NULL, 0);
 }
 
 void ESP32SvelteKit::_loop() {
@@ -177,6 +165,9 @@ void ESP32SvelteKit::_loop() {
         _apSettingsService.loop();   // 10 seconds
 #if FT_ENABLED(FT_MQTT)
         _mqttSettingsService.loop(); // 5 seconds
+#endif
+#if FT_ENABLED(FT_ANALYTICS)
+        _analyticsService.loop();
 #endif
         vTaskDelay(20 / portTICK_PERIOD_MS);
     }

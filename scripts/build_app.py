@@ -26,7 +26,7 @@ Import("env")
 project_dir = env["PROJECT_DIR"]
 buildFlags = env.ParseFlags(env["BUILD_FLAGS"])
 
-interface_dir = project_dir + "/interface"
+interface_dir = project_dir + "/app"
 output_file = project_dir + "/lib/framework/WWWData.h"
 source_www_dir = interface_dir + "/src"
 build_dir = interface_dir + "/build"
@@ -53,15 +53,15 @@ def should_regenerate_output_file():
 
 
 def gzip_file(file):
-    with open(file, 'rb') as f_in:
-        with gzip.open(file + '.gz', 'wb') as f_out:
+    with open(file, "rb") as f_in:
+        with gzip.open(file + ".gz", "wb") as f_out:
             copyfileobj(f_in, f_out)
     os.remove(file)
 
 
 def flag_exists(flag):
     for define in buildFlags.get("CPPDEFINES"):
-        if (define == flag or (isinstance(define, list) and define[0] == flag)):
+        if define == flag or (isinstance(define, list) and define[0] == flag):
             return True
     return False
 

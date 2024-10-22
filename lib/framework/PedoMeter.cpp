@@ -55,8 +55,9 @@ void PedoMeter::_loop() {
 
             doc["time_elapsed"] = timeElapsed;
 
-            JsonObject jsonObject = doc.as<JsonObject>();
-            _socket->emitEvent(EVENT_STEP, jsonObject);
+            String output;
+            serializeJson(doc, output);
+            _socket->emit(EVENT_STEP, output.c_str());
         }
 
         EXECUTE_EVERY_N_MS(30000,

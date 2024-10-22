@@ -2,6 +2,46 @@
 
 SemaphoreHandle_t clientSubscriptionsMutex = xSemaphoreCreateMutex();
 
+message_type_t char_to_message_type(char c) {
+    switch (c) {
+        case '0': return CONNECT;
+        case '1': return DISCONNECT;
+        case '2': return EVENT;
+        case '3': return PING;
+        case '4': return PONG;
+        case '5': return BINARY_EVENT;
+        default: throw std::invalid_argument("Invalid message type");
+    }
+}
+
+const char *getEventName(const char *msg) {
+    const char *start = strchr(msg, '/');
+    if (!start) return nullptr;
+    start++;
+    const char *end = strchr(start, '[');
+    if (!end) return start;
+
+    static char eventName[32];
+    int len = end - start;
+    strncpy(eventName, start, len);
+    eventName[len] = '\0';
+    return eventName;
+}
+
+const char *getEventPayload(const char *msg) {
+    const char *start = strchr(msg + 2, '[');
+    const char *end = msg + strlen(msg) - 1;
+    if (*start == '[') {
+        start++;
+    }
+    int len = end - start;
+    if (len < 0) return nullptr;
+    char *payload = new char[len + 1];
+    strncpy(payload, start, len);
+    payload[len] = '\0';
+    return payload;
+}
+
 EventSocket::EventSocket(PsychicHttpServer *server) : _server(server) {}
 
 void EventSocket::begin() {
@@ -27,42 +67,61 @@ esp_err_t EventSocket::onFrame(PsychicWebSocketRequest *request, httpd_ws_frame 
     ESP_LOGV("EventSocket", "ws[%s][%u] opcode[%d]", request->client()->remoteIP().toString().c_str(),
              request->client()->socket(), frame->type);
 
-    JsonDocument doc;
-#if FT_ENABLED(EVENT_USE_JSON)
-    if (frame->type == HTTPD_WS_TYPE_TEXT) {
-        ESP_LOGV("EventSocket", "ws[%s][%u] request: %s", request->client()->remoteIP().toString().c_str(),
-                 request->client()->socket(), (char *)frame->payload);
+    if (frame->type != HTTPD_WS_TYPE_TEXT) {
+        ESP_LOGE("EventSocket", "Unsupported frame type");
+        return ESP_OK;
+    }
 
-        DeserializationError error = deserializeJson(doc, (char *)frame->payload, frame->len);
-#else
-    if (frame->type == HTTPD_WS_TYPE_BINARY) {
-        ESP_LOGV("EventSocket", "ws[%s][%u] request: %s", request->client()->remoteIP().toString().c_str(),
-                 request->client()->socket(), (char *)frame->payload);
+    ESP_LOGV("EventSocket", "Received message: %s", (char *)frame->payload);
+    char *msg = (char *)frame->payload;
 
-        DeserializationError error = deserializeMsgPack(doc, (char *)frame->payload, frame->len);
-#endif
+    message_type_t message_type = char_to_message_type(msg[0]);
 
-        if (!error && doc.is<JsonObject>()) {
-            String event = doc["event"];
-            if (event == "subscribe") {
-                client_subscriptions[doc["data"]].push_back(request->client()->socket());
-                handleSubscribeCallbacks(doc["data"], String(request->client()->socket()));
-            } else if (event == "unsubscribe") {
-                client_subscriptions[doc["data"]].remove(request->client()->socket());
-            } else {
-                JsonObject jsonObject = doc["data"].as<JsonObject>();
-                handleEventCallbacks(event, jsonObject, request->client()->socket());
-            }
+    if (message_type == PING) {
+        ESP_LOGV("EventSocket", "Ping");
+        request->client()->sendMessage("3");
+        return ESP_OK;
+    } else if (message_type == PONG) {
+        ESP_LOGV("EventSocket", "Pong");
+        return ESP_OK;
+    }
+
+    const char *event = getEventName(msg);
+
+    if (!event) {
+        ESP_LOGE("EventSocket", "Invalid event name");
+        return ESP_OK;
+    }
+
+    if (message_type == CONNECT) {
+        ESP_LOGV("EventSocket", "Connect: %s", event);
+        client_subscriptions[event].push_back(request->client()->socket());
+        handleSubscribeCallbacks(event, String(request->client()->socket()));
+    } else if (message_type == DISCONNECT) {
+        ESP_LOGV("EventSocket", "Disconnect: %s", event);
+        client_subscriptions[event].remove(request->client()->socket());
+    } else if (message_type == EVENT) {
+        const char *payload = getEventPayload(msg);
+        if (!payload) {
+            ESP_LOGE("EventSocket", "Invalid event payload");
             return ESP_OK;
         }
-        ESP_LOGW("EventSocket", "Error[%d] parsing JSON: %s", error, (char *)frame->payload);
+        JsonDocument doc;
+        DeserializationError error = deserializeJson(doc, payload);
+        if (error) {
+            ESP_LOGE("EventSocket", "Failed to parse JSON payload");
+            return ESP_OK;
+        }
+        JsonObject jsonObject = doc.as<JsonObject>();
+        handleEventCallbacks(event, jsonObject, request->client()->socket());
+        return ESP_OK;
     }
     return ESP_OK;
 }
 
 bool EventSocket::hasSubscribers(const char *event) { return !client_subscriptions[event].empty(); }
 
-void EventSocket::emitEvent(String event, JsonObject &jsonObject, const char *originId, bool onlyToSameOrigin) {
+void EventSocket::emit(const char *event, const char *payload, const char *originId, bool onlyToSameOrigin) {
     int originSubscriptionId = originId[0] ? atoi(originId) : -1;
     xSemaphoreTake(clientSubscriptionsMutex, portMAX_DELAY);
     auto &subscriptions = client_subscriptions[event];
@@ -70,39 +129,16 @@ void EventSocket::emitEvent(String event, JsonObject &jsonObject, const char *or
         xSemaphoreGive(clientSubscriptionsMutex);
         return;
     }
-
-    JsonDocument doc;
-    doc["event"] = event;
-    doc["data"] = jsonObject;
-
-#if FT_ENABLED(EVENT_USE_JSON)
-    size_t len = measureJson(doc);
-#else
-    size_t len = measureMsgPack(doc);
-#endif
-
-    char *output = new char[len + 1];
-
-#if FT_ENABLED(EVENT_USE_JSON)
-    serializeJson(doc, output, len + 1);
-#else
-    serializeMsgPack(doc, output, len);
-#endif
-
-    // null terminate the string
-    output[len] = '\0';
+    char msg[strlen(event) + strlen(payload) + 10];
+    snprintf(msg, sizeof(msg), "2/%s[%s]", event, payload);
 
     // if onlyToSameOrigin == true, send the message back to the origin
     if (onlyToSameOrigin && originSubscriptionId > 0) {
         auto *client = _socket.getClient(originSubscriptionId);
         if (client) {
-            ESP_LOGV("EventSocket", "Emitting event: %s to %s, Message[%d]: %s", event,
-                     client->remoteIP().toString().c_str(), len, output);
-#if FT_ENABLED(EVENT_USE_JSON)
-            client->sendMessage(HTTPD_WS_TYPE_TEXT, output, len);
-#else
-            client->sendMessage(HTTPD_WS_TYPE_BINARY, output, len);
-#endif
+            ESP_LOGV("EventSocket", "Emitting event: %s to %s, Message: %s", event,
+                     client->remoteIP().toString().c_str(), msg);
+            client->sendMessage(msg);
         }
     } else { // else send the message to all other clients
 
@@ -113,17 +149,11 @@ void EventSocket::emitEvent(String event, JsonObject &jsonObject, const char *or
                 subscriptions.remove(subscription);
                 continue;
             }
-            ESP_LOGV("EventSocket", "Emitting event: %s to %s, Message[%d]: %s", event,
-                     client->remoteIP().toString().c_str(), len, output);
-#if FT_ENABLED(EVENT_USE_JSON)
-            client->sendMessage(HTTPD_WS_TYPE_TEXT, output, len);
-#else
-            client->sendMessage(HTTPD_WS_TYPE_BINARY, output, len);
-#endif
+            ESP_LOGV("EventSocket", "Emitting event: %s to %s, Message: %s", event,
+                     client->remoteIP().toString().c_str(), msg);
+            client->sendMessage(msg);
         }
     }
-
-    delete[] output;
     xSemaphoreGive(clientSubscriptionsMutex);
 }
 
@@ -133,9 +163,9 @@ void EventSocket::handleEventCallbacks(String event, JsonObject &jsonObject, int
     }
 }
 
-void EventSocket::handleSubscribeCallbacks(String event, const String &originId) {
+void EventSocket::handleSubscribeCallbacks(const char *event, const String &originId) {
     for (auto &callback : subscribe_callbacks[event]) {
-        callback(originId);
+        callback(originId, true);
     }
 }
 
@@ -143,5 +173,4 @@ void EventSocket::onEvent(String event, EventCallback callback) { event_callback
 
 void EventSocket::onSubscribe(String event, SubscribeCallback callback) {
     subscribe_callbacks[event].push_back(callback);
-    ESP_LOGI("EventSocket", "onSubscribe for event: %s", event.c_str());
 }
