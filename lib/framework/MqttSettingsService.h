@@ -106,7 +106,7 @@ public:
 
 class MqttSettingsService : public StatefulService<MqttSettings> {
 public:
-  MqttSettingsService(PsychicHttpServer *server, FS *fs);
+  MqttSettingsService(PsychicHttpServer *server);
   ~MqttSettingsService();
 
   void begin();

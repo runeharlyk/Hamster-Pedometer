@@ -202,7 +202,7 @@ esp_err_t getNetworkStatus(PsychicRequest *request);
 
 class WiFiSettingsService : public StatefulService<WiFiSettings> {
 public:
-  WiFiSettingsService(PsychicHttpServer *server, FS *fs, EventSocket *socket);
+  WiFiSettingsService(PsychicHttpServer *server, EventSocket *socket);
 
   void initWiFi();
   void begin();

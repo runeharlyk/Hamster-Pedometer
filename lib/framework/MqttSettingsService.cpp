@@ -39,10 +39,10 @@ static char *retainCstr(const char *cstr, char **ptr) {
   return *ptr;
 }
 
-MqttSettingsService::MqttSettingsService(PsychicHttpServer *server, FS *fs)
+MqttSettingsService::MqttSettingsService(PsychicHttpServer *server)
     : _server(server), _httpEndpoint(MqttSettings::read, MqttSettings::update,
                                      this, server, MQTT_SETTINGS_SERVICE_PATH),
-      _fsPersistence(MqttSettings::read, MqttSettings::update, this, fs,
+      _fsPersistence(MqttSettings::read, MqttSettings::update, this,
                      MQTT_SETTINGS_FILE),
       _retainedHost(nullptr), _retainedClientId(nullptr),
       _retainedUsername(nullptr), _retainedPassword(nullptr),

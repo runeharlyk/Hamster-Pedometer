@@ -140,7 +140,7 @@ public:
 
 class APSettingsService : public StatefulService<APSettings> {
 public:
-  APSettingsService(PsychicHttpServer *server, FS *fs);
+  APSettingsService(PsychicHttpServer *server);
 
   void begin();
   void loop();

@@ -16,10 +16,10 @@
 
 static const char *TAG = "APService";
 
-APSettingsService::APSettingsService(PsychicHttpServer *server, FS *fs)
+APSettingsService::APSettingsService(PsychicHttpServer *server)
     : _server(server), _httpEndpoint(APSettings::read, APSettings::update, this,
                                      server, AP_SETTINGS_SERVICE_PATH),
-      _fsPersistence(APSettings::read, APSettings::update, this, fs,
+      _fsPersistence(APSettings::read, APSettings::update, this,
                      AP_SETTINGS_FILE),
       _dnsServer(nullptr), _lastManaged(0), _reconfigureAp(false) {
   addUpdateHandler([&](const String &originId) { reconfigureAP(); }, false);

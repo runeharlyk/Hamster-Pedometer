@@ -16,12 +16,12 @@
 
 static const char *TAG = "Wifi Service";
 
-WiFiSettingsService::WiFiSettingsService(PsychicHttpServer *server, FS *fs,
+WiFiSettingsService::WiFiSettingsService(PsychicHttpServer *server,
 
                                          EventSocket *socket)
     : _server(server), _httpEndpoint(WiFiSettings::read, WiFiSettings::update,
                                      this, server, WIFI_SETTINGS_SERVICE_PATH),
-      _fsPersistence(WiFiSettings::read, WiFiSettings::update, this, fs,
+      _fsPersistence(WiFiSettings::read, WiFiSettings::update, this,
                      WIFI_SETTINGS_FILE),
       _lastConnectionAttempt(0), _socket(socket) {
   addUpdateHandler([&](const String &originId) { reconfigureWiFiConnection(); },

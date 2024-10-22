@@ -114,11 +114,11 @@ public:
 
 class PedoMeter : public StatefulService<PedoMeterData> {
 public:
-  PedoMeter(PsychicHttpServer *server, FS *fs, EventSocket *socket)
+  PedoMeter(PsychicHttpServer *server, EventSocket *socket)
       : _socket(socket),
         _httpEndpoint(PedoMeterData::read, PedoMeterData::update, this, server,
                       STEPS_SETTINGS_SERVICE_PATH),
-        _fsPersistence(PedoMeterData::read, PedoMeterData::update, this, fs,
+        _fsPersistence(PedoMeterData::read, PedoMeterData::update, this,
                        STEPS_FILE){};
 
   void begin();

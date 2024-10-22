@@ -3,10 +3,10 @@
 static const char *TAG = "ESP32SvelteKit";
 
 ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server)
-    : _server(server), _wifiSettingsService(server, &ESPFS, &_socket),
-      _apSettingsService(server, &ESPFS), _socket(server),
+    : _server(server), _wifiSettingsService(server, &_socket),
+      _apSettingsService(server), _socket(server),
 #if FT_ENABLED(FT_NTP)
-      _ntpSettingsService(server, &ESPFS),
+      _ntpSettingsService(server),
 #endif
 #if FT_ENABLED(FT_UPLOAD_FIRMWARE)
       _uploadFirmwareService(server),
@@ -15,13 +15,12 @@ ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server)
       _downloadFirmwareService(server, &_socket),
 #endif
 #if FT_ENABLED(FT_MQTT)
-      _mqttSettingsService(server, &ESPFS, &_securitySettingsService),
-      _mqttStatus(server, &_mqttSettingsService, &_securitySettingsService),
+      _mqttSettingsService(server), _mqttStatus(server, &_mqttSettingsService),
 #endif
 #if FT_ENABLED(FT_ANALYTICS)
       _analyticsService(&_socket),
 #endif
-      _pedoMeter(server, &ESPFS, &_socket) {
+      _pedoMeter(server, &_socket) {
 }
 
 void ESP32SvelteKit::begin() {

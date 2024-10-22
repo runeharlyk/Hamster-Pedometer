@@ -16,10 +16,10 @@
 
 static const char *TAG = "NPT Service";
 
-NTPSettingsService::NTPSettingsService(PsychicHttpServer *server, FS *fs)
+NTPSettingsService::NTPSettingsService(PsychicHttpServer *server)
     : _server(server), _httpEndpoint(NTPSettings::read, NTPSettings::update,
                                      this, server, NTP_SETTINGS_SERVICE_PATH),
-      _fsPersistence(NTPSettings::read, NTPSettings::update, this, fs,
+      _fsPersistence(NTPSettings::read, NTPSettings::update, this,
                      NTP_SETTINGS_FILE) {
   addUpdateHandler([&](const String &originId) { configureNTP(); }, false);
 }
