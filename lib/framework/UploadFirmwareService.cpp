@@ -16,16 +16,14 @@
 #include <esp_app_format.h>
 #include <esp_ota_ops.h>
 
-
 using namespace std::placeholders; // for `_1` etc
 
 static char md5[33] = "\0";
 
 static FileType fileType = ft_none;
 
-UploadFirmwareService::UploadFirmwareService(PsychicHttpServer *server,
-                                             SecurityManager *securityManager)
-    : _server(server), _securityManager(securityManager) {}
+UploadFirmwareService::UploadFirmwareService(PsychicHttpServer *server)
+    : _server(server) {}
 
 void UploadFirmwareService::begin() {
   _server->maxUploadSize = 2300000; // 2.3 MB
@@ -50,13 +48,6 @@ esp_err_t UploadFirmwareService::handleUpload(PsychicRequest *request,
                                               const String &filename,
                                               uint64_t index, uint8_t *data,
                                               size_t len, bool final) {
-  // quit if not authorized
-  Authentication authentication =
-      _securityManager->authenticateRequest(request);
-  if (!AuthenticationPredicates::IS_ADMIN(authentication)) {
-    return handleError(request, 403); // forbidden
-  }
-
   // at init
   if (!index) {
     // check details of the file, to see if its a valid bin or json file

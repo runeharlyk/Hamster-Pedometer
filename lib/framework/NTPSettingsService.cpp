@@ -16,11 +16,9 @@
 
 static const char *TAG = "NPT Service";
 
-NTPSettingsService::NTPSettingsService(PsychicHttpServer *server, FS *fs,
-                                       SecurityManager *securityManager)
-    : _server(server), _securityManager(securityManager),
-      _httpEndpoint(NTPSettings::read, NTPSettings::update, this, server,
-                    NTP_SETTINGS_SERVICE_PATH, securityManager),
+NTPSettingsService::NTPSettingsService(PsychicHttpServer *server, FS *fs)
+    : _server(server), _httpEndpoint(NTPSettings::read, NTPSettings::update,
+                                     this, server, NTP_SETTINGS_SERVICE_PATH),
       _fsPersistence(NTPSettings::read, NTPSettings::update, this, fs,
                      NTP_SETTINGS_FILE) {
   addUpdateHandler([&](const String &originId) { configureNTP(); }, false);

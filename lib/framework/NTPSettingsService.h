@@ -68,8 +68,7 @@ public:
 
 class NTPSettingsService : public StatefulService<NTPSettings> {
 public:
-  NTPSettingsService(PsychicHttpServer *server, FS *fs,
-                     SecurityManager *securityManager);
+  NTPSettingsService(PsychicHttpServer *server, FS *fs);
 
   void begin();
   static esp_err_t getStatus(PsychicRequest *request);
@@ -77,7 +76,6 @@ public:
 
 private:
   PsychicHttpServer *_server;
-  SecurityManager *_securityManager;
   HttpEndpoint<NTPSettings> _httpEndpoint;
   FSPersistence<NTPSettings> _fsPersistence;
 

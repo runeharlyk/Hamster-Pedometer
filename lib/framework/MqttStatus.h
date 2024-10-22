@@ -20,22 +20,18 @@
 #include <ArduinoJson.h>
 #include <MqttSettingsService.h>
 #include <PsychicHttp.h>
-#include <SecurityManager.h>
-
 
 #define MQTT_STATUS_SERVICE_PATH "/api/v1/mqttStatus"
 
 class MqttStatus {
 public:
   MqttStatus(PsychicHttpServer *server,
-             MqttSettingsService *mqttSettingsService,
-             SecurityManager *securityManager);
+             MqttSettingsService *mqttSettingsService);
 
   void begin();
 
 private:
   PsychicHttpServer *_server;
-  SecurityManager *_securityManager;
   MqttSettingsService *_mqttSettingsService;
 
   esp_err_t mqttStatus(PsychicRequest *request);

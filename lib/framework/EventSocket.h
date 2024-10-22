@@ -1,11 +1,13 @@
 #ifndef Socket_h
 #define Socket_h
 
+#include <Features.h>
 #include <PsychicHttp.h>
 #include <StatefulService.h>
 #include <list>
 #include <map>
 #include <vector>
+
 
 #define EVENT_SERVICE_PATH "/ws/events"
 
@@ -16,7 +18,7 @@ class EventSocket {
 public:
   EventSocket(PsychicHttpServer *server);
 
-  PsychicWebSocketHandler *EventSocket::getHandler() { return &_socket; }
+  PsychicWebSocketHandler *getHandler() { return &_socket; }
 
   void begin();
 

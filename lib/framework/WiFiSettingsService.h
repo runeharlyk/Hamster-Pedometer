@@ -21,7 +21,6 @@
 #include <HttpEndpoint.h>
 #include <JsonUtils.h>
 #include <PsychicHttp.h>
-#include <SecurityManager.h>
 #include <SettingValue.h>
 #include <StatefulService.h>
 #include <WiFi.h>
@@ -203,8 +202,7 @@ esp_err_t getNetworkStatus(PsychicRequest *request);
 
 class WiFiSettingsService : public StatefulService<WiFiSettings> {
 public:
-  WiFiSettingsService(PsychicHttpServer *server, FS *fs,
-                      SecurityManager *securityManager, EventSocket *socket);
+  WiFiSettingsService(PsychicHttpServer *server, FS *fs, EventSocket *socket);
 
   void initWiFi();
   void begin();
@@ -213,7 +211,6 @@ public:
 
 private:
   PsychicHttpServer *_server;
-  SecurityManager *_securityManager;
   HttpEndpoint<WiFiSettings> _httpEndpoint;
   FSPersistence<WiFiSettings> _fsPersistence;
   EventSocket *_socket;

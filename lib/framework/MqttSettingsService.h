@@ -23,7 +23,6 @@
 #include <StatefulService.h>
 #include <WiFi.h>
 
-
 #ifndef FACTORY_MQTT_ENABLED
 #define FACTORY_MQTT_ENABLED false
 #endif
@@ -107,8 +106,7 @@ public:
 
 class MqttSettingsService : public StatefulService<MqttSettings> {
 public:
-  MqttSettingsService(PsychicHttpServer *server, FS *fs,
-                      SecurityManager *securityManager);
+  MqttSettingsService(PsychicHttpServer *server, FS *fs);
   ~MqttSettingsService();
 
   void begin();
@@ -124,7 +122,6 @@ protected:
 
 private:
   PsychicHttpServer *_server;
-  SecurityManager *_securityManager;
   HttpEndpoint<MqttSettings> _httpEndpoint;
   FSPersistence<MqttSettings> _fsPersistence;
 

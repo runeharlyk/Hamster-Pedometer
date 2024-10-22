@@ -1,112 +1,85 @@
 #ifndef HttpEndpoint_h
 #define HttpEndpoint_h
 
+#include <PsychicHttp.h>
+#include <StatefulService.h>
 #include <functional>
 
-#include <PsychicHttp.h>
-
-#include <SecurityManager.h>
-#include <StatefulService.h>
 
 #define HTTP_ENDPOINT_ORIGIN_ID "http"
 #define HTTPS_ENDPOINT_ORIGIN_ID "https"
 
 using namespace std::placeholders; // for `_1` etc
 
-template <class T>
-class HttpEndpoint
-{
+template <class T> class HttpEndpoint {
 protected:
-    JsonStateReader<T> _stateReader;
-    JsonStateUpdater<T> _stateUpdater;
-    StatefulService<T> *_statefulService;
-    SecurityManager *_securityManager;
-    AuthenticationPredicate _authenticationPredicate;
-    PsychicHttpServer *_server;
-    const char *_servicePath;
+  JsonStateReader<T> _stateReader;
+  JsonStateUpdater<T> _stateUpdater;
+  StatefulService<T> *_statefulService;
+  PsychicHttpServer *_server;
+  const char *_servicePath;
 
 public:
-    HttpEndpoint(JsonStateReader<T> stateReader,
-                 JsonStateUpdater<T> stateUpdater,
-                 StatefulService<T> *statefulService,
-                 PsychicHttpServer *server,
-                 const char *servicePath,
-                 SecurityManager *securityManager,
-                 AuthenticationPredicate authenticationPredicate = AuthenticationPredicates::IS_ADMIN) : _stateReader(stateReader),
-                                                                                                         _stateUpdater(stateUpdater),
-                                                                                                         _statefulService(statefulService),
-                                                                                                         _server(server),
-                                                                                                         _servicePath(servicePath),
-                                                                                                         _securityManager(securityManager),
-                                                                                                         _authenticationPredicate(authenticationPredicate)
-    {
-    }
+  HttpEndpoint(JsonStateReader<T> stateReader, JsonStateUpdater<T> stateUpdater,
+               StatefulService<T> *statefulService, PsychicHttpServer *server,
+               const char *servicePath)
+      : _stateReader(stateReader), _stateUpdater(stateUpdater),
+        _statefulService(statefulService), _server(server),
+        _servicePath(servicePath) {}
 
-    // register the web server on() endpoints
-    void begin()
-    {
+  // register the web server on() endpoints
+  void begin() {
 
 // OPTIONS (for CORS preflight)
 #ifdef ENABLE_CORS
-        _server->on(_servicePath,
-                    HTTP_OPTIONS,
-                    _securityManager->wrapRequest(
-                        [this](PsychicRequest *request)
-                        {
-                            return request->reply(200);
-                        },
-                        AuthenticationPredicates::IS_AUTHENTICATED));
+    _server->on(_servicePath, HTTP_OPTIONS, [this](PsychicRequest *request) {
+      return request->reply(200);
+    });
 #endif
 
-        // GET
-        _server->on(_servicePath,
-                    HTTP_GET,
-                    _securityManager->wrapRequest(
-                        [this](PsychicRequest *request)
-                        {
-                            PsychicJsonResponse response = PsychicJsonResponse(request, false);
-                            JsonObject jsonObject = response.getRoot();
-                            _statefulService->read(jsonObject, _stateReader);
-                            return response.send();
-                        },
-                        _authenticationPredicate));
-        ESP_LOGV("HttpEndpoint", "Registered GET endpoint: %s", _servicePath);
+    // GET
+    _server->on(_servicePath, HTTP_GET,
 
-        // POST
-        _server->on(_servicePath,
-                    HTTP_POST,
-                    _securityManager->wrapCallback(
-                        [this](PsychicRequest *request, JsonVariant &json)
-                        {
-                            if (!json.is<JsonObject>())
-                            {
-                                return request->reply(400);
-                            }
+                [this](PsychicRequest *request) {
+                  PsychicJsonResponse response =
+                      PsychicJsonResponse(request, false);
+                  JsonObject jsonObject = response.getRoot();
+                  _statefulService->read(jsonObject, _stateReader);
+                  return response.send();
+                });
+    ESP_LOGV("HttpEndpoint", "Registered GET endpoint: %s", _servicePath);
 
-                            JsonObject jsonObject = json.as<JsonObject>();
-                            StateUpdateResult outcome = _statefulService->updateWithoutPropagation(jsonObject, _stateUpdater);
+    // POST
+    _server->on(
+        _servicePath, HTTP_POST,
 
-                            if (outcome == StateUpdateResult::ERROR)
-                            {
-                                return request->reply(400);
-                            }
-                            else if ((outcome == StateUpdateResult::CHANGED))
-                            {
-                                // persist the changes to the FS
-                                _statefulService->callUpdateHandlers(HTTP_ENDPOINT_ORIGIN_ID);
-                            }
+        [this](PsychicRequest *request, JsonVariant &json) {
+          if (!json.is<JsonObject>()) {
+            return request->reply(400);
+          }
 
-                            PsychicJsonResponse response = PsychicJsonResponse(request, false);
-                            jsonObject = response.getRoot();
+          JsonObject jsonObject = json.as<JsonObject>();
+          StateUpdateResult outcome =
+              _statefulService->updateWithoutPropagation(jsonObject,
+                                                         _stateUpdater);
 
-                            _statefulService->read(jsonObject, _stateReader);
+          if (outcome == StateUpdateResult::ERROR) {
+            return request->reply(400);
+          } else if ((outcome == StateUpdateResult::CHANGED)) {
+            // persist the changes to the FS
+            _statefulService->callUpdateHandlers(HTTP_ENDPOINT_ORIGIN_ID);
+          }
 
-                            return response.send();
-                        },
-                        _authenticationPredicate));
+          PsychicJsonResponse response = PsychicJsonResponse(request, false);
+          jsonObject = response.getRoot();
 
-        ESP_LOGV("HttpEndpoint", "Registered POST endpoint: %s", _servicePath);
-    }
+          _statefulService->read(jsonObject, _stateReader);
+
+          return response.send();
+        });
+
+    ESP_LOGV("HttpEndpoint", "Registered POST endpoint: %s", _servicePath);
+  }
 };
 
 #endif

@@ -114,12 +114,10 @@ public:
 
 class PedoMeter : public StatefulService<PedoMeterData> {
 public:
-  PedoMeter(PsychicHttpServer *server, FS *fs, SecurityManager *securityManager,
-            EventSocket *socket)
-      : _socket(socket), _securityManager(securityManager),
+  PedoMeter(PsychicHttpServer *server, FS *fs, EventSocket *socket)
+      : _socket(socket),
         _httpEndpoint(PedoMeterData::read, PedoMeterData::update, this, server,
-                      STEPS_SETTINGS_SERVICE_PATH, securityManager,
-                      AuthenticationPredicates::IS_ADMIN),
+                      STEPS_SETTINGS_SERVICE_PATH),
         _fsPersistence(PedoMeterData::read, PedoMeterData::update, this, fs,
                        STEPS_FILE){};
 
@@ -128,7 +126,6 @@ public:
 protected:
   HttpEndpoint<PedoMeterData> _httpEndpoint;
   FSPersistence<PedoMeterData> _fsPersistence;
-  SecurityManager *_securityManager;
   EventSocket *_socket;
 
   static void _loopImpl(void *_this) {

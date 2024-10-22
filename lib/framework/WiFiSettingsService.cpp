@@ -17,12 +17,10 @@
 static const char *TAG = "Wifi Service";
 
 WiFiSettingsService::WiFiSettingsService(PsychicHttpServer *server, FS *fs,
-                                         SecurityManager *securityManager,
+
                                          EventSocket *socket)
-    : _server(server), _securityManager(securityManager),
-      _httpEndpoint(WiFiSettings::read, WiFiSettings::update, this, server,
-                    WIFI_SETTINGS_SERVICE_PATH, securityManager,
-                    AuthenticationPredicates::IS_ADMIN),
+    : _server(server), _httpEndpoint(WiFiSettings::read, WiFiSettings::update,
+                                     this, server, WIFI_SETTINGS_SERVICE_PATH),
       _fsPersistence(WiFiSettings::read, WiFiSettings::update, this, fs,
                      WIFI_SETTINGS_FILE),
       _lastConnectionAttempt(0), _socket(socket) {

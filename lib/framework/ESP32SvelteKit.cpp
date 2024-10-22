@@ -3,35 +3,25 @@
 static const char *TAG = "ESP32SvelteKit";
 
 ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server)
-    : _server(server), _securitySettingsService(server, &ESPFS),
-      _wifiSettingsService(server, &ESPFS, &_securitySettingsService, &_socket),
-      _apSettingsService(server, &ESPFS, &_securitySettingsService),
-      _socket(server, &_securitySettingsService,
-              AuthenticationPredicates::IS_AUTHENTICATED),
-      _notificationService(&_socket),
+    : _server(server), _wifiSettingsService(server, &ESPFS, &_socket),
+      _apSettingsService(server, &ESPFS), _socket(server),
 #if FT_ENABLED(FT_NTP)
-      _ntpSettingsService(server, &ESPFS, &_securitySettingsService),
+      _ntpSettingsService(server, &ESPFS),
 #endif
 #if FT_ENABLED(FT_UPLOAD_FIRMWARE)
-      _uploadFirmwareService(server, &_securitySettingsService),
+      _uploadFirmwareService(server),
 #endif
 #if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
-      _downloadFirmwareService(server, &_securitySettingsService, &_socket),
+      _downloadFirmwareService(server, &_socket),
 #endif
 #if FT_ENABLED(FT_MQTT)
       _mqttSettingsService(server, &ESPFS, &_securitySettingsService),
       _mqttStatus(server, &_mqttSettingsService, &_securitySettingsService),
 #endif
-#if FT_ENABLED(FT_SECURITY)
-      _authenticationService(server, &_securitySettingsService),
-#endif
-#if FT_ENABLED(FT_BATTERY)
-      _batteryService(&_socket),
-#endif
 #if FT_ENABLED(FT_ANALYTICS)
       _analyticsService(&_socket),
 #endif
-      _pedoMeter(server, &ESPFS, &_securitySettingsService, &_socket) {
+      _pedoMeter(server, &ESPFS, &_socket) {
 }
 
 void ESP32SvelteKit::begin() {
@@ -138,7 +128,6 @@ void ESP32SvelteKit::setupMDNS() {
 
 void ESP32SvelteKit::startServices() {
   _socket.begin();
-  _notificationService.begin();
   _apSettingsService.begin();
   _wifiSettingsService.begin();
 
@@ -155,15 +144,8 @@ void ESP32SvelteKit::startServices() {
   _mqttSettingsService.begin();
   _mqttStatus.begin();
 #endif
-#if FT_ENABLED(FT_SECURITY)
-  _authenticationService.begin();
-  _securitySettingsService.begin();
-#endif
 #if FT_ENABLED(FT_ANALYTICS)
   _analyticsService.begin();
-#endif
-#if FT_ENABLED(FT_BATTERY)
-  _batteryService.begin();
 #endif
   _pedoMeter.begin();
 

@@ -96,19 +96,16 @@ void updateTask(void *param) {
   vTaskDelete(NULL);
 }
 
-DownloadFirmwareService::DownloadFirmwareService(
-    PsychicHttpServer *server, SecurityManager *securityManager,
-    EventSocket *socket)
-    : _server(server), _securityManager(securityManager), _socket(socket) {}
+DownloadFirmwareService::DownloadFirmwareService(PsychicHttpServer *server,
+                                                 EventSocket *socket)
+    : _server(server), _socket(socket) {}
 
 void DownloadFirmwareService::begin() {
   _socket->registerEvent(EVENT_DOWNLOAD_OTA);
 
   _server->on(GITHUB_FIRMWARE_PATH, HTTP_POST,
-              _securityManager->wrapCallback(
-                  std::bind(&DownloadFirmwareService::downloadUpdate, this,
-                            std::placeholders::_1, std::placeholders::_2),
-                  AuthenticationPredicates::IS_ADMIN));
+              std::bind(&DownloadFirmwareService::downloadUpdate, this,
+                        std::placeholders::_1, std::placeholders::_2));
 
   ESP_LOGV(TAG, "Registered POST endpoint: %s", GITHUB_FIRMWARE_PATH);
 }

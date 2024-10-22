@@ -4,8 +4,6 @@
 #include <APSettingsService.h>
 #include <AnalyticsService.h>
 #include <Arduino.h>
-#include <AuthenticationService.h>
-#include <BatteryService.h>
 #include <DownloadFirmwareService.h>
 #include <ESPFS.h>
 #include <ESPmDNS.h>
@@ -14,10 +12,8 @@
 #include <MqttSettingsService.h>
 #include <MqttStatus.h>
 #include <NTPSettingsService.h>
-#include <NotificationService.h>
 #include <PedoMeter.h>
 #include <PsychicHttp.h>
-#include <SecuritySettingsService.h>
 #include <UploadFirmwareService.h>
 #include <WiFi.h>
 #include <WiFiSettingsService.h>
@@ -47,15 +43,7 @@ public:
 
   PsychicHttpServer *getServer() { return _server; }
 
-  SecurityManager *getSecurityManager() { return &_securitySettingsService; }
-
   EventSocket *getSocket() { return &_socket; }
-
-#if FT_ENABLED(FT_SECURITY)
-  StatefulService<SecuritySettings> *getSecuritySettingsService() {
-    return &_securitySettingsService;
-  }
-#endif
 
   StatefulService<WiFiSettings> *getWiFiSettingsService() {
     return &_wifiSettingsService;
@@ -63,10 +51,6 @@ public:
 
   StatefulService<APSettings> *getAPSettingsService() {
     return &_apSettingsService;
-  }
-
-  NotificationService *getNotificationService() {
-    return &_notificationService;
   }
 
 #if FT_ENABLED(FT_NTP)
@@ -85,21 +69,15 @@ public:
   }
 #endif
 
-#if FT_ENABLED(FT_BATTERY)
-  BatteryService *getBatteryService() { return &_batteryService; }
-#endif
-
   void setMDNSAppName(String name) { _appName = name; }
 
   void recoveryMode() { _apSettingsService.recoveryMode(); }
 
 private:
   PsychicHttpServer *_server;
-  SecuritySettingsService _securitySettingsService;
   WiFiSettingsService _wifiSettingsService;
   APSettingsService _apSettingsService;
   EventSocket _socket;
-  NotificationService _notificationService;
 #if FT_ENABLED(FT_NTP)
   NTPSettingsService _ntpSettingsService;
 #endif
@@ -112,12 +90,6 @@ private:
 #if FT_ENABLED(FT_MQTT)
   MqttSettingsService _mqttSettingsService;
   MqttStatus _mqttStatus;
-#endif
-#if FT_ENABLED(FT_SECURITY)
-  AuthenticationService _authenticationService;
-#endif
-#if FT_ENABLED(FT_BATTERY)
-  BatteryService _batteryService;
 #endif
 #if FT_ENABLED(FT_ANALYTICS)
   AnalyticsService _analyticsService;

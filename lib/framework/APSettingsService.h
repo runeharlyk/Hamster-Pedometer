@@ -140,8 +140,7 @@ public:
 
 class APSettingsService : public StatefulService<APSettings> {
 public:
-  APSettingsService(PsychicHttpServer *server, FS *fs,
-                    SecurityManager *securityManager);
+  APSettingsService(PsychicHttpServer *server, FS *fs);
 
   void begin();
   void loop();
@@ -152,7 +151,6 @@ public:
 
 private:
   PsychicHttpServer *_server;
-  SecurityManager *_securityManager;
   HttpEndpoint<APSettings> _httpEndpoint;
   FSPersistence<APSettings> _fsPersistence;
 
