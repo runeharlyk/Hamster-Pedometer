@@ -50,11 +50,11 @@ class ESP32SvelteKit {
 
     StatefulService<APSettings> *getAPSettingsService() { return &_apSettingsService; }
 
-#if FT_ENABLED(FT_NTP)
+#if FT_ENABLED(USE_NTP)
     StatefulService<NTPSettings> *getNTPSettingsService() { return &_ntpSettingsService; }
 #endif
 
-#if FT_ENABLED(FT_MQTT)
+#if FT_ENABLED(USE_MQTT)
     StatefulService<MqttSettings> *getMqttSettingsService() { return &_mqttSettingsService; }
 
     PsychicMqttClient *getMqttClient() { return _mqttSettingsService.getMqttClient(); }
@@ -69,20 +69,20 @@ class ESP32SvelteKit {
     WiFiSettingsService _wifiSettingsService;
     APSettingsService _apSettingsService;
     EventSocket _socket;
-#if FT_ENABLED(FT_NTP)
+#if FT_ENABLED(USE_NTP)
     NTPSettingsService _ntpSettingsService;
 #endif
-#if FT_ENABLED(FT_UPLOAD_FIRMWARE)
+#if FT_ENABLED(USE_UPLOAD_FIRMWARE)
     UploadFirmwareService _uploadFirmwareService;
 #endif
-#if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
+#if FT_ENABLED(USE_DOWNLOAD_FIRMWARE)
     DownloadFirmwareService _downloadFirmwareService;
 #endif
-#if FT_ENABLED(FT_MQTT)
+#if FT_ENABLED(USE_MQTT)
     MqttSettingsService _mqttSettingsService;
     MqttStatus _mqttStatus;
 #endif
-#if FT_ENABLED(FT_ANALYTICS)
+#if FT_ENABLED(USE_ANALYTICS)
     AnalyticsService _analyticsService;
 #endif
     PedoMeter _pedoMeter;

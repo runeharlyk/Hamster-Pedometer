@@ -548,11 +548,11 @@ ESP32-SvelteKit offers two different ways to roll out firmware updates to field 
 
 ### Firmware Upload
 
-Enabling `FT_UPLOAD_FIRMWARE=1` in [features.ini](https://github.com/theelims/ESP32-sveltekit/blob/main/features.ini) creates a REST endpoint that one can post a firmware binary to. The frontend has a file drop zone to upload a new firmware binary from the browser.
+Enabling `USE_UPLOAD_FIRMWARE=1` in [features.ini](https://github.com/theelims/ESP32-sveltekit/blob/main/features.ini) creates a REST endpoint that one can post a firmware binary to. The frontend has a file drop zone to upload a new firmware binary from the browser.
 
 ### Firmware Download from Update Server
 
-By enabling `FT_DOWNLOAD_FIRMWARE=1` in [features.ini](https://github.com/theelims/ESP32-sveltekit/blob/main/features.ini) one can POST a link to a firmware binary which is downloaded for the OTA process. This feature requires SSL and is thus dependent on `FT_NTP=1`. The Frontend contains an implementation which uses GitHub's Releases section as the update server. By specifying a firmware version in [platformio.ini](https://github.com/theelims/ESP32-sveltekit/blob/main/platformio.ini) one can make use of semantic versioning to determine the correct firmware:
+By enabling `USE_DOWNLOAD_FIRMWARE=1` in [features.ini](https://github.com/theelims/ESP32-sveltekit/blob/main/features.ini) one can POST a link to a firmware binary which is downloaded for the OTA process. This feature requires SSL and is thus dependent on `USE_NTP=1`. The Frontend contains an implementation which uses GitHub's Releases section as the update server. By specifying a firmware version in [platformio.ini](https://github.com/theelims/ESP32-sveltekit/blob/main/platformio.ini) one can make use of semantic versioning to determine the correct firmware:
 
 ```ini
     -D BUILD_TARGET="$PIOENV"

@@ -3,32 +3,32 @@
 namespace feature_service {
 
 void features(JsonObject &root) {
-#if FT_ENABLED(FT_MQTT)
+#if FT_ENABLED(USE_MQTT)
     root["mqtt"] = true;
 #else
     root["mqtt"] = false;
 #endif
-#if FT_ENABLED(FT_NTP)
+#if FT_ENABLED(USE_NTP)
     root["ntp"] = true;
 #else
     root["ntp"] = false;
 #endif
-#if FT_ENABLED(FT_UPLOAD_FIRMWARE)
+#if FT_ENABLED(USE_UPLOAD_FIRMWARE)
     root["upload_firmware"] = true;
 #else
     root["upload_firmware"] = false;
 #endif
-#if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
+#if FT_ENABLED(USE_DOWNLOAD_FIRMWARE)
     root["download_firmware"] = true;
 #else
     root["download_firmware"] = false;
 #endif
-#if FT_ENABLED(FT_SLEEP)
+#if FT_ENABLED(USE_SLEEP)
     root["sleep"] = true;
 #else
     root["sleep"] = false;
 #endif
-#if FT_ENABLED(FT_ANALYTICS)
+#if FT_ENABLED(USE_ANALYTICS)
     root["analytics"] = true;
 #else
     root["analytics"] = false;

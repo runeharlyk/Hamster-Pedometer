@@ -7,20 +7,20 @@ ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server)
       _wifiSettingsService(server, &_socket),
       _apSettingsService(server),
       _socket(server),
-#if FT_ENABLED(FT_NTP)
+#if FT_ENABLED(USE_NTP)
       _ntpSettingsService(server),
 #endif
-#if FT_ENABLED(FT_UPLOAD_FIRMWARE)
+#if FT_ENABLED(USE_UPLOAD_FIRMWARE)
       _uploadFirmwareService(server, &_socket),
 #endif
-#if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
+#if FT_ENABLED(USE_DOWNLOAD_FIRMWARE)
       _downloadFirmwareService(&_socket),
 #endif
-#if FT_ENABLED(FT_MQTT)
+#if FT_ENABLED(USE_MQTT)
       _mqttSettingsService(server),
       _mqttStatus(server, &_mqttSettingsService),
 #endif
-#if FT_ENABLED(FT_ANALYTICS)
+#if FT_ENABLED(USE_ANALYTICS)
       _analyticsService(&_socket),
 #endif
       _pedoMeter(server, &_socket) {
@@ -96,7 +96,7 @@ void ESP32SvelteKit::setupServer() {
     });
 
 // NTP
-#if FT_ENABLED(FT_NTP)
+#if FT_ENABLED(USE_NTP)
     _server->on("/api/v1/ntp/status", HTTP_GET, [this](PsychicRequest *r) { return _ntpSettingsService.getStatus(r); });
     _server->on("/api/v1/ntp/time", HTTP_POST,
                 [this](PsychicRequest *r, JsonVariant &json) { return _ntpSettingsService.handleTime(r, json); });
@@ -122,7 +122,7 @@ void ESP32SvelteKit::setupServer() {
     _server->on("/api/v1/firmware", HTTP_POST, _uploadFirmwareService.getHandler());
 
     // FIRMWARE
-#if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
+#if FT_ENABLED(USE_DOWNLOAD_FIRMWARE)
     _server->on("/api/v1/firmware/download", HTTP_POST, [this](PsychicRequest *r, JsonVariant &json) {
         return _downloadFirmwareService.handleDownloadUpdate(r, json);
     });
@@ -159,13 +159,13 @@ void ESP32SvelteKit::startServices() {
     _apSettingsService.begin();
     _wifiSettingsService.begin();
 
-#if FT_ENABLED(FT_UPLOAD_FIRMWARE)
+#if FT_ENABLED(USE_UPLOAD_FIRMWARE)
     _uploadFirmwareService.begin();
 #endif
-#if FT_ENABLED(FT_NTP)
+#if FT_ENABLED(USE_NTP)
     _ntpSettingsService.begin();
 #endif
-#if FT_ENABLED(FT_MQTT)
+#if FT_ENABLED(USE_MQTT)
     _mqttSettingsService.begin();
     _mqttStatus.begin();
 #endif
@@ -178,10 +178,10 @@ void ESP32SvelteKit::_loop() {
     while (1) {
         _wifiSettingsService.loop(); // 30 seconds
         _apSettingsService.loop();   // 10 seconds
-#if FT_ENABLED(FT_MQTT)
+#if FT_ENABLED(USE_MQTT)
         _mqttSettingsService.loop(); // 5 seconds
 #endif
-#if FT_ENABLED(FT_ANALYTICS)
+#if FT_ENABLED(USE_ANALYTICS)
         _analyticsService.loop();
 #endif
         vTaskDelay(20 / portTICK_PERIOD_MS);

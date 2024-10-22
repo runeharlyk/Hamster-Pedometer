@@ -23,20 +23,20 @@ Many of the framework's built in features may be enabled or disabled as required
 Customize the settings as you see fit. A value of 0 will disable the specified feature:
 
 ```ini
-  -D FT_MQTT=1
-  -D FT_NTP=1
-  -D FT_UPLOAD_FIRMWARE=1
-  -D FT_DOWNLOAD_FIRMWARE=1
-  -D FT_SLEEP=1
+  -D USE_MQTT=1
+  -D USE_NTP=1
+  -D USE_UPLOAD_FIRMWARE=1
+  -D USE_DOWNLOAD_FIRMWARE=1
+  -D USE_SLEEP=1
 ```
 
-| Flag                 | Description                                                                                                                                                                                                              |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| FT_MQTT              | Controls whether the MQTT features are enabled. Disable this if your project does not require MQTT support.                                                                                                              |
-| FT_NTP               | Controls whether network time protocol synchronization features are enabled. Disable this if your project does not require accurate time.                                                                                |
-| FT_UPLOAD_FIRMWARE   | Controls whether the manual upload firmware feature is enabled. Disable this if you won't be manually uploading firmware.                                                                                                |
-| FT_DOWNLOAD_FIRMWARE | Controls whether the firmware download feature is enabled. Disable this if you won't firmware pulled from a server.                                                                                                      |
-| FT_SLEEP             | Controls whether the deep sleep feature is enabled. Disable this if your device is not battery operated or you don't need to place it in deep sleep to save energy.                                                      |
+| Flag                  | Description                                                                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| USE_MQTT              | Controls whether the MQTT features are enabled. Disable this if your project does not require MQTT support.                                                         |
+| USE_NTP               | Controls whether network time protocol synchronization features are enabled. Disable this if your project does not require accurate time.                           |
+| USE_UPLOAD_FIRMWARE   | Controls whether the manual upload firmware feature is enabled. Disable this if you won't be manually uploading firmware.                                           |
+| USE_DOWNLOAD_FIRMWARE | Controls whether the firmware download feature is enabled. Disable this if you won't firmware pulled from a server.                                                 |
+| USE_SLEEP             | Controls whether the deep sleep feature is enabled. Disable this if your device is not battery operated or you don't need to place it in deep sleep to save energy. |
 
 In addition custom features might be added or removed at runtime. See [Custom Features](statefulservice.md#custom-features) on how to use this in your application.
 
@@ -142,7 +142,7 @@ The script will download a public certificate store from Mozilla (`board_ssl_cer
 
 !!! info
 
-     To enable SSL the feature `FT_NTP=1` must be enabled as well.
+     To enable SSL the feature `USE_NTP=1` must be enabled as well.
 
 ## Vite and LittleFS 32 Character Limit
 

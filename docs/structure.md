@@ -82,7 +82,7 @@ On the root level there are two more files which you can customize to your needs
 
 ## Github Firmware Update
 
-If the feature `FT_DOWNLOAD_FIRMWARE` is enabled, ESP32 SvelteKit pulls the Github Release section through the Github API for firmware updates once per hour. Also the firmware update menu shows all available firmware releases allowing the user to up- and downgrade has they please. If you're using the Github releases section you must first tell the frontend your correct path to your github repository as described [here](sveltekit.md#changing-the-app-name).
+If the feature `USE_DOWNLOAD_FIRMWARE` is enabled, ESP32 SvelteKit pulls the Github Release section through the Github API for firmware updates once per hour. Also the firmware update menu shows all available firmware releases allowing the user to up- and downgrade has they please. If you're using the Github releases section you must first tell the frontend your correct path to your github repository as described [here](sveltekit.md#changing-the-app-name).
 
 Also you must make use of couple build flags in [platformio.ini](https://github.com/theelims/ESP32-sveltekit/blob/main/platformio.ini):
 
