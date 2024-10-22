@@ -14,7 +14,7 @@
 		try {
 			const formData = new FormData();
 			formData.append('file', files[0]);
-			const response = await fetch('/api/v1/uploadFirmware', {
+			const response = await fetch('/api/v1/firmware', {
 				method: 'POST',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic'

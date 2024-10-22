@@ -11,10 +11,10 @@ ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server)
       _ntpSettingsService(server),
 #endif
 #if FT_ENABLED(FT_UPLOAD_FIRMWARE)
-      _uploadFirmwareService(server),
+      _uploadFirmwareService(server, &_socket),
 #endif
 #if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
-      _downloadFirmwareService(server, &_socket),
+      _downloadFirmwareService(&_socket),
 #endif
 #if FT_ENABLED(FT_MQTT)
       _mqttSettingsService(server),
@@ -28,15 +28,17 @@ ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server)
 
 void ESP32SvelteKit::begin() {
     ESP_LOGV("ESP32SvelteKit", "Loading settings from files system");
+    ESP_LOGI(TAG, "Running Firmware Version: %s\n", APP_VERSION);
+
     ESPFS.begin(true);
 
     _wifiSettingsService.initWiFi();
 
-    ESP_LOGI(TAG, "Running Firmware Version: %s\n", APP_VERSION);
+    setupMDNS();
+
+    startServices();
 
     setupServer();
-    setupMDNS();
-    startServices();
 }
 
 void ESP32SvelteKit::setupServer() {
@@ -113,8 +115,18 @@ void ESP32SvelteKit::setupServer() {
 
     // MISC
     _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
+    if (!_socket.getHandler()) {
+        ESP_LOGE(TAG, "Could not get socket ptr");
+    }
     _server->on("/ws/events", _socket.getHandler());
     _server->on("/api/v1/firmware", HTTP_POST, _uploadFirmwareService.getHandler());
+
+    // FIRMWARE
+#if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
+    _server->on("/api/v1/firmware/download", HTTP_POST, [this](PsychicRequest *r, JsonVariant &json) {
+        return _downloadFirmwareService.handleDownloadUpdate(r, json);
+    });
+#endif
 
     // PEDOMETER
     _server->on("/api/v1/steps", HTTP_GET, [this](PsychicRequest *r) { return _pedoMeter.endpoint.getState(r); });
@@ -149,9 +161,6 @@ void ESP32SvelteKit::startServices() {
 
 #if FT_ENABLED(FT_UPLOAD_FIRMWARE)
     _uploadFirmwareService.begin();
-#endif
-#if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
-    _downloadFirmwareService.begin();
 #endif
 #if FT_ENABLED(FT_NTP)
     _ntpSettingsService.begin();

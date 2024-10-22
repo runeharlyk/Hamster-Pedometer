@@ -29,6 +29,9 @@ void WiFiSettingsService::initWiFi() {
 
     _fsPersistence.readFromFS();
     reconfigureWiFiConnection();
+    if (!_state.wifiSettings.empty()) {
+        configureNetwork(_state.wifiSettings.front());
+    }
 }
 
 void WiFiSettingsService::begin() {}

@@ -16,6 +16,7 @@ class Initializer {
 };
 
 static Initializer initializer;
+
 esp_err_t getFiles(PsychicRequest *request) { return request->reply(200, "application/json", listFiles("/").c_str()); }
 
 esp_err_t handleDelete(PsychicRequest *request, JsonVariant &json) {

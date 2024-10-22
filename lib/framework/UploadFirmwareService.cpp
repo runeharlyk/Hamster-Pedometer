@@ -16,13 +16,18 @@
 #include <esp_app_format.h>
 #include <esp_ota_ops.h>
 
+static const char *TAG = "UploadFirmwareService";
+
 using namespace std::placeholders; // for `_1` etc
 
 static char md5[33] = "\0";
+static size_t fsize = 0;
+static size_t uploaded = 0;
 
 static FileType fileType = ft_none;
 
-UploadFirmwareService::UploadFirmwareService(PsychicHttpServer *server) : _server(server) {}
+UploadFirmwareService::UploadFirmwareService(PsychicHttpServer *server, EventSocket *socket)
+    : _server(server), _socket(socket) {}
 
 void UploadFirmwareService::begin() {
     uploadHandler.onUpload(std::bind(&UploadFirmwareService::handleUpload, this, _1, _2, _3, _4, _5, _6));
@@ -38,7 +43,7 @@ esp_err_t UploadFirmwareService::handleUpload(PsychicRequest *request, const Str
         std::string fname(filename.c_str());
         auto position = fname.find_last_of(".");
         std::string extension = fname.substr(position + 1);
-        size_t fsize = request->contentLength();
+        fsize = request->contentLength();
 
         fileType = ft_none;
         if ((extension == "bin") && (fsize > 1000000)) {
@@ -78,9 +83,11 @@ esp_err_t UploadFirmwareService::handleUpload(PsychicRequest *request, const Str
 #endif
             // it's firmware - initialize the ArduinoOTA updater
             if (Update.begin(fsize - sizeof(esp_image_header_t))) {
+                ESP_LOGI(TAG, "Starting update");
                 if (strlen(md5) == 32) {
                     Update.setMD5(md5);
                     md5[0] = '\0';
+                    ESP_LOGI(TAG, "Setting MD5 hash");
                 }
             } else {
                 return handleError(request, 507); // failed to begin, send an error
@@ -93,10 +100,20 @@ esp_err_t UploadFirmwareService::handleUpload(PsychicRequest *request, const Str
     if (!request->_tempObject) {
         if (Update.write(data, len) != len) {
             handleError(request, 500);
+        } else {
+            uploaded += len;
+            char buffer[16];
+            snprintf(buffer, sizeof(buffer), "%f", (float)uploaded / (float)fsize * 100.f);
+            _socket->emit("otastatus", buffer);
+            delay(20);
+            ESP_LOGI(TAG, "Wrote more %d (%d/%d) - %s", len, uploaded, fsize, buffer);
         }
         if (final) {
             if (!Update.end(true)) {
                 handleError(request, 500);
+            } else {
+                _socket->emit("otastatus", "100");
+                ESP_LOGI(TAG, "Finish writing update");
             }
         }
     }
@@ -119,6 +136,7 @@ esp_err_t UploadFirmwareService::uploadComplete(PsychicRequest *request) {
     // if no error, send the success response
     if (!request->_tempObject) {
         request->reply(200);
+        ESP_LOGI(TAG, "Finish updating");
         system_service::restart();
         return ESP_OK;
     }

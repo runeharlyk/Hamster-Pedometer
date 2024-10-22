@@ -11,14 +11,16 @@
 		error: 'alert-error',
 		success: 'alert-success',
 		warning: 'alert-warning',
-		info: 'alert-info'
+		info: 'alert-info',
+		progress: 'alert-info'
 	};
 
 	export let icon = {
 		error: error,
 		success: success,
 		warning: warning,
-		info: info
+		info: info,
+		progress: info
 	};
 </script>
 
@@ -31,7 +33,12 @@
 			out:fly={{ x: 100, duration: 400 }}
 		>
 			<svelte:component this={icon[notification.type]} class="h-6 w-6 flex-shrink-0" />
-			<span>{notification.message}</span>
+			{#if notification.type === 'progress'}
+				<progress class="progress progress-info w-56" value={notification.message} max="100">
+				</progress>
+			{:else}
+				<span>{notification.message}</span>
+			{/if}
 		</div>
 	{/each}
 </div>

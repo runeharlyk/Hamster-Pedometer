@@ -17,12 +17,10 @@
 
 class DownloadFirmwareService {
   public:
-    DownloadFirmwareService(PsychicHttpServer *server, EventSocket *socket);
+    DownloadFirmwareService(EventSocket *socket);
 
-    void begin();
+    esp_err_t handleDownloadUpdate(PsychicRequest *request, JsonVariant &json);
 
   private:
-    PsychicHttpServer *_server;
     EventSocket *_socket;
-    esp_err_t downloadUpdate(PsychicRequest *request, JsonVariant &json);
 };
