@@ -24,17 +24,16 @@
 #define MQTT_STATUS_SERVICE_PATH "/api/v1/mqttStatus"
 
 class MqttStatus {
-public:
-  MqttStatus(PsychicHttpServer *server,
-             MqttSettingsService *mqttSettingsService);
+  public:
+    MqttStatus(PsychicHttpServer *server, MqttSettingsService *mqttSettingsService);
 
-  void begin();
+    void begin();
 
-private:
-  PsychicHttpServer *_server;
-  MqttSettingsService *_mqttSettingsService;
+  private:
+    PsychicHttpServer *_server;
+    MqttSettingsService *_mqttSettingsService;
 
-  esp_err_t mqttStatus(PsychicRequest *request);
+    esp_err_t mqttStatus(PsychicRequest *request);
 };
 
 #endif // end MqttStatus_h

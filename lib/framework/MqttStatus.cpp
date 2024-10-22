@@ -14,26 +14,23 @@
 
 #include <MqttStatus.h>
 
-MqttStatus::MqttStatus(PsychicHttpServer *server,
-                       MqttSettingsService *mqttSettingsService)
+MqttStatus::MqttStatus(PsychicHttpServer *server, MqttSettingsService *mqttSettingsService)
     : _server(server), _mqttSettingsService(mqttSettingsService) {}
 
 void MqttStatus::begin() {
-  _server->on(MQTT_STATUS_SERVICE_PATH, HTTP_GET,
-              [this](PsychicRequest *r) { return mqttStatus(r); });
+    _server->on(MQTT_STATUS_SERVICE_PATH, HTTP_GET, [this](PsychicRequest *r) { return mqttStatus(r); });
 
-  ESP_LOGV("MqttStatus", "Registered GET endpoint: %s",
-           MQTT_STATUS_SERVICE_PATH);
+    ESP_LOGV("MqttStatus", "Registered GET endpoint: %s", MQTT_STATUS_SERVICE_PATH);
 }
 
 esp_err_t MqttStatus::mqttStatus(PsychicRequest *request) {
-  PsychicJsonResponse response = PsychicJsonResponse(request, false);
-  JsonObject root = response.getRoot();
+    PsychicJsonResponse response = PsychicJsonResponse(request, false);
+    JsonObject root = response.getRoot();
 
-  root["enabled"] = _mqttSettingsService->isEnabled();
-  root["connected"] = _mqttSettingsService->isConnected();
-  root["client_id"] = _mqttSettingsService->getClientId();
-  root["last_error"] = _mqttSettingsService->getLastError();
+    root["enabled"] = _mqttSettingsService->isEnabled();
+    root["connected"] = _mqttSettingsService->isConnected();
+    root["client_id"] = _mqttSettingsService->getClientId();
+    root["last_error"] = _mqttSettingsService->getLastError();
 
-  return response.send();
+    return response.send();
 }

@@ -37,7 +37,7 @@
 
 	async function getNTPSettings() {
 		try {
-			const response = await fetch('/api/v1/ntpSettings', {
+			const response = await fetch('/api/v1/ntp/settings', {
 				method: 'GET',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
@@ -71,7 +71,7 @@
 
 	async function postNTPSettings(data: NTPSettings) {
 		try {
-			const response = await fetch('/api/v1/ntpSettings', {
+			const response = await fetch('/api/v1/ntp/settings', {
 				method: 'POST',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',

@@ -1,26 +1,12 @@
 #ifndef APSettingsConfig_h
 #define APSettingsConfig_h
 
-/**
- *   ESP32 SvelteKit
- *
- *   A simple, secure and extensible framework for IoT projects for ESP32
- *platforms with responsive Sveltekit front-end built with TailwindCSS and
- *DaisyUI. https://github.com/theelims/ESP32-sveltekit
- *
- *   Copyright (C) 2018 - 2023 rjwats
- *   Copyright (C) 2023 - 2024 theelims
- *
- *   All Rights Reserved. This software may be modified and distributed under
- *   the terms of the LGPL v3 license. See the LICENSE file for details.
- **/
-
 #include <ESPFS.h>
 #include <FSPersistence.h>
-#include <HttpEndpoint.h>
 #include <JsonUtils.h>
 #include <SettingValue.h>
 #include <WiFi.h>
+#include <stateful_endpoint.h>
 
 #include <DNSServer.h>
 #include <IPAddress.h>
@@ -61,8 +47,6 @@
 #define FACTORY_AP_MAX_CLIENTS 4
 #endif
 
-#define AP_SETTINGS_SERVICE_PATH "/api/v1/apSettings"
-
 #define AP_MODE_ALWAYS 0
 #define AP_MODE_DISCONNECTED 1
 #define AP_MODE_NEVER 2
@@ -73,100 +57,93 @@
 enum APNetworkStatus { ACTIVE = 0, INACTIVE, LINGERING };
 
 class APSettings {
-public:
-  uint8_t provisionMode;
-  String ssid;
-  String password;
-  uint8_t channel;
-  bool ssidHidden;
-  uint8_t maxClients;
+  public:
+    uint8_t provisionMode;
+    String ssid;
+    String password;
+    uint8_t channel;
+    bool ssidHidden;
+    uint8_t maxClients;
 
-  IPAddress localIP;
-  IPAddress gatewayIP;
-  IPAddress subnetMask;
+    IPAddress localIP;
+    IPAddress gatewayIP;
+    IPAddress subnetMask;
 
-  bool operator==(const APSettings &settings) const {
-    return provisionMode == settings.provisionMode && ssid == settings.ssid &&
-           password == settings.password && channel == settings.channel &&
-           ssidHidden == settings.ssidHidden &&
-           maxClients == settings.maxClients && localIP == settings.localIP &&
-           gatewayIP == settings.gatewayIP && subnetMask == settings.subnetMask;
-  }
-
-  static void read(APSettings &settings, JsonObject &root) {
-    root["provision_mode"] = settings.provisionMode;
-    root["ssid"] = settings.ssid;
-    root["password"] = settings.password;
-    root["channel"] = settings.channel;
-    root["ssid_hidden"] = settings.ssidHidden;
-    root["max_clients"] = settings.maxClients;
-    root["local_ip"] = settings.localIP.toString();
-    root["gateway_ip"] = settings.gatewayIP.toString();
-    root["subnet_mask"] = settings.subnetMask.toString();
-  }
-
-  static StateUpdateResult update(JsonObject &root, APSettings &settings) {
-    APSettings newSettings = {};
-    newSettings.provisionMode =
-        root["provision_mode"] | FACTORY_AP_PROVISION_MODE;
-    switch (settings.provisionMode) {
-    case AP_MODE_ALWAYS:
-    case AP_MODE_DISCONNECTED:
-    case AP_MODE_NEVER:
-      break;
-    default:
-      newSettings.provisionMode = AP_MODE_DISCONNECTED;
+    bool operator==(const APSettings &settings) const {
+        return provisionMode == settings.provisionMode && ssid == settings.ssid && password == settings.password &&
+               channel == settings.channel && ssidHidden == settings.ssidHidden && maxClients == settings.maxClients &&
+               localIP == settings.localIP && gatewayIP == settings.gatewayIP && subnetMask == settings.subnetMask;
     }
-    newSettings.ssid = root["ssid"] | SettingValue::format(FACTORY_AP_SSID);
-    newSettings.password = root["password"] | FACTORY_AP_PASSWORD;
-    newSettings.channel = root["channel"] | FACTORY_AP_CHANNEL;
-    newSettings.ssidHidden = root["ssid_hidden"] | FACTORY_AP_SSID_HIDDEN;
-    newSettings.maxClients = root["max_clients"] | FACTORY_AP_MAX_CLIENTS;
 
-    JsonUtils::readIP(root, "local_ip", newSettings.localIP,
-                      FACTORY_AP_LOCAL_IP);
-    JsonUtils::readIP(root, "gateway_ip", newSettings.gatewayIP,
-                      FACTORY_AP_GATEWAY_IP);
-    JsonUtils::readIP(root, "subnet_mask", newSettings.subnetMask,
-                      FACTORY_AP_SUBNET_MASK);
-
-    if (newSettings == settings) {
-      return StateUpdateResult::UNCHANGED;
+    static void read(APSettings &settings, JsonObject &root) {
+        root["provision_mode"] = settings.provisionMode;
+        root["ssid"] = settings.ssid;
+        root["password"] = settings.password;
+        root["channel"] = settings.channel;
+        root["ssid_hidden"] = settings.ssidHidden;
+        root["max_clients"] = settings.maxClients;
+        root["local_ip"] = settings.localIP.toString();
+        root["gateway_ip"] = settings.gatewayIP.toString();
+        root["subnet_mask"] = settings.subnetMask.toString();
     }
-    settings = newSettings;
-    return StateUpdateResult::CHANGED;
-  }
+
+    static StateUpdateResult update(JsonObject &root, APSettings &settings) {
+        APSettings newSettings = {};
+        newSettings.provisionMode = root["provision_mode"] | FACTORY_AP_PROVISION_MODE;
+        switch (settings.provisionMode) {
+            case AP_MODE_ALWAYS:
+            case AP_MODE_DISCONNECTED:
+            case AP_MODE_NEVER: break;
+            default: newSettings.provisionMode = AP_MODE_DISCONNECTED;
+        }
+        newSettings.ssid = root["ssid"] | SettingValue::format(FACTORY_AP_SSID);
+        newSettings.password = root["password"] | FACTORY_AP_PASSWORD;
+        newSettings.channel = root["channel"] | FACTORY_AP_CHANNEL;
+        newSettings.ssidHidden = root["ssid_hidden"] | FACTORY_AP_SSID_HIDDEN;
+        newSettings.maxClients = root["max_clients"] | FACTORY_AP_MAX_CLIENTS;
+
+        JsonUtils::readIP(root, "local_ip", newSettings.localIP, FACTORY_AP_LOCAL_IP);
+        JsonUtils::readIP(root, "gateway_ip", newSettings.gatewayIP, FACTORY_AP_GATEWAY_IP);
+        JsonUtils::readIP(root, "subnet_mask", newSettings.subnetMask, FACTORY_AP_SUBNET_MASK);
+
+        if (newSettings == settings) {
+            return StateUpdateResult::UNCHANGED;
+        }
+        settings = newSettings;
+        return StateUpdateResult::CHANGED;
+    }
 };
 
 class APSettingsService : public StatefulService<APSettings> {
-public:
-  APSettingsService(PsychicHttpServer *server);
+  public:
+    APSettingsService(PsychicHttpServer *server);
 
-  void begin();
-  void loop();
-  APNetworkStatus getAPNetworkStatus();
-  void recoveryMode();
+    void begin();
+    void loop();
+    APNetworkStatus getAPNetworkStatus();
+    void recoveryMode();
 
-  esp_err_t getStatus(PsychicRequest *request);
+    esp_err_t getStatus(PsychicRequest *request);
 
-private:
-  PsychicHttpServer *_server;
-  HttpEndpoint<APSettings> _httpEndpoint;
-  FSPersistence<APSettings> _fsPersistence;
+    HttpEndpoint<APSettings> endpoint;
 
-  // for the captive portal
-  DNSServer *_dnsServer;
+  private:
+    PsychicHttpServer *_server;
+    FSPersistence<APSettings> _fsPersistence;
 
-  // for the mangement delay loop
-  volatile unsigned long _lastManaged;
-  volatile boolean _reconfigureAp;
-  volatile boolean _recoveryMode = false;
+    // for the captive portal
+    DNSServer *_dnsServer;
 
-  void reconfigureAP();
-  void manageAP();
-  void startAP();
-  void stopAP();
-  void handleDNS();
+    // for the mangement delay loop
+    volatile unsigned long _lastManaged;
+    volatile boolean _reconfigureAp;
+    volatile boolean _recoveryMode = false;
+
+    void reconfigureAP();
+    void manageAP();
+    void startAP();
+    void stopAP();
+    void handleDNS();
 };
 
 #endif // end APSettingsConfig_h

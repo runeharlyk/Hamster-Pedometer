@@ -30,11 +30,9 @@
 #ifndef STRINGIFY
 #define STRINGIFY(s) #s
 #endif
-#define ARDUINO_VERSION_STR(major, minor, patch)                               \
-  "v" STRINGIFY(major) "." STRINGIFY(minor) "." STRINGIFY(patch)
-#define ARDUINO_VERSION                                                        \
-  ARDUINO_VERSION_STR(ESP_ARDUINO_VERSION_MAJOR, ESP_ARDUINO_VERSION_MINOR,    \
-                      ESP_ARDUINO_VERSION_PATCH)
+#define ARDUINO_VERSION_STR(major, minor, patch) "v" STRINGIFY(major) "." STRINGIFY(minor) "." STRINGIFY(patch)
+#define ARDUINO_VERSION \
+    ARDUINO_VERSION_STR(ESP_ARDUINO_VERSION_MAJOR, ESP_ARDUINO_VERSION_MINOR, ESP_ARDUINO_VERSION_PATCH)
 #endif
 
 /*

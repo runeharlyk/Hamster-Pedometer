@@ -30,13 +30,13 @@
 #define OTA_TASK_STACK_SIZE 9216
 
 class DownloadFirmwareService {
-public:
-  DownloadFirmwareService(PsychicHttpServer *server, EventSocket *socket);
+  public:
+    DownloadFirmwareService(PsychicHttpServer *server, EventSocket *socket);
 
-  void begin();
+    void begin();
 
-private:
-  PsychicHttpServer *_server;
-  EventSocket *_socket;
-  esp_err_t downloadUpdate(PsychicRequest *request, JsonVariant &json);
+  private:
+    PsychicHttpServer *_server;
+    EventSocket *_socket;
+    esp_err_t downloadUpdate(PsychicRequest *request, JsonVariant &json);
 };

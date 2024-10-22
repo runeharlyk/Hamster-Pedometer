@@ -38,7 +38,7 @@
 
 	async function getAPSettings() {
 		try {
-			const response = await fetch('/api/v1/apSettings', {
+			const response = await fetch('/api/v1/wifi/ap/settings', {
 				method: 'GET',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
@@ -96,7 +96,7 @@
 
 	async function postAPSettings(data: ApSettings) {
 		try {
-			const response = await fetch('/api/v1/apSettings', {
+			const response = await fetch('/api/v1/wifi/ap/settings', {
 				method: 'POST',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',

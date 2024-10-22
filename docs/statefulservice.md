@@ -173,7 +173,7 @@ lightStateService->update(jsonObject, LightState::update, "timer");
 
 ### HTTP RESTful Endpoint
 
-The framework provides an [HttpEndpoint.h](https://github.com/theelims/ESP32-sveltekit/blob/main/lib/framework/HttpEndpoint.h) class which may be used to register GET and POST handlers to read and update the state over HTTP. You may construct an HttpEndpoint as a part of the StatefulService or separately if you prefer.
+The framework provides an [stateful_endpoint.h](https://github.com/theelims/ESP32-sveltekit/blob/main/lib/framework/stateful_endpoint.h) class which may be used to register GET and POST handlers to read and update the state over HTTP. You may construct an HttpEndpoint as a part of the StatefulService or separately if you prefer.
 
 The code below demonstrates how to extend the LightStateService class to provide an endpoint:
 

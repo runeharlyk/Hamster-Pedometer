@@ -34,82 +34,70 @@
 #endif
 
 class ESP32SvelteKit {
-public:
-  ESP32SvelteKit(PsychicHttpServer *server);
+  public:
+    ESP32SvelteKit(PsychicHttpServer *server);
 
-  void begin();
+    void begin();
 
-  FS *getFS() { return &ESPFS; }
+    FS *getFS() { return &ESPFS; }
 
-  PsychicHttpServer *getServer() { return _server; }
+    PsychicHttpServer *getServer() { return _server; }
 
-  EventSocket *getSocket() { return &_socket; }
+    EventSocket *getSocket() { return &_socket; }
 
-  StatefulService<WiFiSettings> *getWiFiSettingsService() {
-    return &_wifiSettingsService;
-  }
+    StatefulService<WiFiSettings> *getWiFiSettingsService() { return &_wifiSettingsService; }
 
-  StatefulService<APSettings> *getAPSettingsService() {
-    return &_apSettingsService;
-  }
+    StatefulService<APSettings> *getAPSettingsService() { return &_apSettingsService; }
 
 #if FT_ENABLED(FT_NTP)
-  StatefulService<NTPSettings> *getNTPSettingsService() {
-    return &_ntpSettingsService;
-  }
+    StatefulService<NTPSettings> *getNTPSettingsService() { return &_ntpSettingsService; }
 #endif
 
 #if FT_ENABLED(FT_MQTT)
-  StatefulService<MqttSettings> *getMqttSettingsService() {
-    return &_mqttSettingsService;
-  }
+    StatefulService<MqttSettings> *getMqttSettingsService() { return &_mqttSettingsService; }
 
-  PsychicMqttClient *getMqttClient() {
-    return _mqttSettingsService.getMqttClient();
-  }
+    PsychicMqttClient *getMqttClient() { return _mqttSettingsService.getMqttClient(); }
 #endif
 
-  void setMDNSAppName(String name) { _appName = name; }
+    void setMDNSAppName(String name) { _appName = name; }
 
-  void recoveryMode() { _apSettingsService.recoveryMode(); }
+    void recoveryMode() { _apSettingsService.recoveryMode(); }
 
-private:
-  PsychicHttpServer *_server;
-  WiFiSettingsService _wifiSettingsService;
-  APSettingsService _apSettingsService;
-  EventSocket _socket;
+  private:
+    PsychicHttpServer *_server;
+    WiFiSettingsService _wifiSettingsService;
+    APSettingsService _apSettingsService;
+    EventSocket _socket;
 #if FT_ENABLED(FT_NTP)
-  NTPSettingsService _ntpSettingsService;
+    NTPSettingsService _ntpSettingsService;
 #endif
 #if FT_ENABLED(FT_UPLOAD_FIRMWARE)
-  UploadFirmwareService _uploadFirmwareService;
+    UploadFirmwareService _uploadFirmwareService;
 #endif
 #if FT_ENABLED(FT_DOWNLOAD_FIRMWARE)
-  DownloadFirmwareService _downloadFirmwareService;
+    DownloadFirmwareService _downloadFirmwareService;
 #endif
 #if FT_ENABLED(FT_MQTT)
-  MqttSettingsService _mqttSettingsService;
-  MqttStatus _mqttStatus;
+    MqttSettingsService _mqttSettingsService;
+    MqttStatus _mqttStatus;
 #endif
 #if FT_ENABLED(FT_ANALYTICS)
-  AnalyticsService _analyticsService;
+    AnalyticsService _analyticsService;
 #endif
-  PedoMeter _pedoMeter;
+    PedoMeter _pedoMeter;
 
-  String _appName = APP_NAME;
+    String _appName = APP_NAME;
 
-  const u_int16_t _numberEndpoints = 115;
-  const u_int32_t _maxFileUpload = 2300000; // 2.3 MB
-  const uint16_t _port = 80;
+    const u_int16_t _numberEndpoints = 115;
+    const u_int32_t _maxFileUpload = 2300000; // 2.3 MB
+    const uint16_t _port = 80;
 
-protected:
-  static void _loopImpl(void *_this) {
-    static_cast<ESP32SvelteKit *>(_this)->_loop();
-  }
-  void _loop();
-  void setupServer();
-  void setupMDNS();
-  void startServices();
+  protected:
+    static void _loopImpl(void *_this) { static_cast<ESP32SvelteKit *>(_this)->_loop(); }
+    void _loop();
+    void setupServer();
+    void setupMDNS();
+    void startServices();
 };
 
 #endif
