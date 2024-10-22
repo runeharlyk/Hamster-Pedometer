@@ -33,9 +33,4 @@
 #define USE_ANALYTICS 1
 #endif
 
-// Use JSON for events. Default, use MessagePack for events
-#ifndef EVENT_USE_JSON
-#define EVENT_USE_JSON 0
-#endif
-
 #endif
