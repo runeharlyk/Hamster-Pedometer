@@ -18,6 +18,7 @@
 #include <WiFi.h>
 #include <WiFiSettingsService.h>
 #include <system_service.h>
+#include <filesystem_service.h>
 
 #include <WWWData.h>
 

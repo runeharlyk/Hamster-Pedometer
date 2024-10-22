@@ -105,6 +105,12 @@ void ESP32SvelteKit::setupServer() {
     });
 #endif
 
+    // FILESYSTEM
+    _server->on("/api/files", HTTP_GET, FileSystem::getFiles);
+    _server->on("/api/files/delete", HTTP_POST, FileSystem::handleDelete);
+    _server->on("/api/files/upload/*", HTTP_POST, FileSystem::uploadHandler);
+    _server->on("/api/files/edit", HTTP_POST, FileSystem::handleEdit);
+
     // MISC
     _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
     _server->on("/ws/events", _socket.getHandler());
