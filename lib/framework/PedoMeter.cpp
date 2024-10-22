@@ -16,9 +16,6 @@ void IRAM_ATTR hallSensorInterrupt() {
 }
 
 void PedoMeter::begin() {
-    _socket->registerEvent(EVENT_STEP);
-    _socket->registerEvent("reset_pedometer");
-
     _socket->onEvent("reset_pedometer", [&](JsonObject &root, int originId) {
         _state.reset();
         _fsPersistence.writeToFS();

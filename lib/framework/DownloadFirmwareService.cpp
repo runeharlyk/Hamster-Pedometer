@@ -95,8 +95,6 @@ DownloadFirmwareService::DownloadFirmwareService(PsychicHttpServer *server, Even
     : _server(server), _socket(socket) {}
 
 void DownloadFirmwareService::begin() {
-    _socket->registerEvent(EVENT_DOWNLOAD_OTA);
-
     _server->on(
         GITHUB_FIRMWARE_PATH, HTTP_POST,
         std::bind(&DownloadFirmwareService::downloadUpdate, this, std::placeholders::_1, std::placeholders::_2));

@@ -331,7 +331,7 @@ To subscribe the client has to send the following message (as MessagePack):
 
 ### Emit an Event
 
-The Event Socket provides an `emitEvent()` function to push data to all subscribed clients. This is used by various esp32sveltekit classes to push real time data to the client. First an event must be registered with the Event Socket by calling `_socket.registerEvent("CustomEvent");`. Only then clients may subscribe to this custom event and you're entitled to emit event data:
+The Event Socket provides an `emitEvent()` function to push data to all subscribe:
 
 ```cpp
 void emitEvent(String event, JsonObject &jsonObject, const char *originId = "", bool onlyToSameOrigin = false);

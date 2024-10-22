@@ -31,7 +31,7 @@ void WiFiSettingsService::initWiFi() {
     reconfigureWiFiConnection();
 }
 
-void WiFiSettingsService::begin() { _socket->registerEvent(EVENT_RSSI); }
+void WiFiSettingsService::begin() {}
 
 void WiFiSettingsService::reconfigureWiFiConnection() {
     // reset last connection attempt to force loop to reconnect immediately

@@ -27,8 +27,6 @@ class AnalyticsService {
     AnalyticsService(EventSocket *socket) : _socket(socket) {};
 
     void begin() {
-        _socket->registerEvent(EVENT_ANALYTICS);
-
         xTaskCreatePinnedToCore(this->_loopImpl,     // Function that should be called
                                 "Analytics Service", // Name of the task (for debugging)
                                 5120,                // Stack size (bytes)

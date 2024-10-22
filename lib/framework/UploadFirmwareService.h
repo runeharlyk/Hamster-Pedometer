@@ -33,8 +33,11 @@ class UploadFirmwareService {
 
     void begin();
 
+    PsychicUploadHandler *getHandler() { return &uploadHandler; }
+
   private:
     PsychicHttpServer *_server;
+    PsychicUploadHandler uploadHandler;
 
     esp_err_t handleUpload(PsychicRequest *request, const String &filename, uint64_t index, uint8_t *data, size_t len,
                            bool final);

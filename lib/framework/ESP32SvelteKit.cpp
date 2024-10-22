@@ -108,6 +108,7 @@ void ESP32SvelteKit::setupServer() {
     // MISC
     _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
     _server->on("/ws/events", _socket.getHandler());
+    _server->on("/api/v1/firmware", HTTP_POST, _uploadFirmwareService.getHandler());
 
     // PEDOMETER
     _server->on("/api/v1/steps", HTTP_GET, [this](PsychicRequest *r) { return _pedoMeter.endpoint.getState(r); });

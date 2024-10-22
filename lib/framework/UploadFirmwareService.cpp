@@ -25,18 +25,9 @@ static FileType fileType = ft_none;
 UploadFirmwareService::UploadFirmwareService(PsychicHttpServer *server) : _server(server) {}
 
 void UploadFirmwareService::begin() {
-    _server->maxUploadSize = 2300000; // 2.3 MB
-
-    PsychicUploadHandler *uploadHandler = new PsychicUploadHandler();
-
-    uploadHandler->onUpload(std::bind(&UploadFirmwareService::handleUpload, this, _1, _2, _3, _4, _5, _6));
-    uploadHandler->onRequest(std::bind(&UploadFirmwareService::uploadComplete, this,
-                                       _1)); // gets called after upload has been handled
-    uploadHandler->onClose(std::bind(&UploadFirmwareService::handleEarlyDisconnect,
-                                     this)); // gets called if client disconnects
-    _server->on(UPLOAD_FIRMWARE_PATH, HTTP_POST, uploadHandler);
-
-    ESP_LOGV("UploadFirmwareService", "Registered POST endpoint: %s", UPLOAD_FIRMWARE_PATH);
+    uploadHandler.onUpload(std::bind(&UploadFirmwareService::handleUpload, this, _1, _2, _3, _4, _5, _6));
+    uploadHandler.onRequest(std::bind(&UploadFirmwareService::uploadComplete, this, _1));
+    uploadHandler.onClose(std::bind(&UploadFirmwareService::handleEarlyDisconnect, this));
 }
 
 esp_err_t UploadFirmwareService::handleUpload(PsychicRequest *request, const String &filename, uint64_t index,
