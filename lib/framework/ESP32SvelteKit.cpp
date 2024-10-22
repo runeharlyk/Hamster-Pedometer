@@ -109,6 +109,9 @@ void ESP32SvelteKit::setupServer() {
     _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
     _server->on("/ws/events", _socket.getHandler());
 
+    // PEDOMETER
+    _server->on("/api/v1/steps", HTTP_GET, [this](PsychicRequest *r) { return _pedoMeter.endpoint.getState(r); });
+
     // STATIC CONFIG
 #if SERVE_CONFIG_FILES
     _server->serveStatic("/api/config/", ESPFS, "/config/");

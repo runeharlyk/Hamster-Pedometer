@@ -88,7 +88,7 @@
 
 	async function getWifiSettings() {
 		try {
-			const response = await fetch('/api/v1/wifi/settings', {
+			const response = await fetch('/api/v1/wifi/sta/settings', {
 				method: 'GET',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',

@@ -3,11 +3,6 @@
 namespace feature_service {
 
 void features(JsonObject &root) {
-#if FT_ENABLED(FT_SECURITY)
-    root["security"] = true;
-#else
-    root["security"] = false;
-#endif
 #if FT_ENABLED(FT_MQTT)
     root["mqtt"] = true;
 #else
@@ -32,11 +27,6 @@ void features(JsonObject &root) {
     root["sleep"] = true;
 #else
     root["sleep"] = false;
-#endif
-#if FT_ENABLED(FT_BATTERY)
-    root["battery"] = true;
-#else
-    root["battery"] = false;
 #endif
 #if FT_ENABLED(FT_ANALYTICS)
     root["analytics"] = true;

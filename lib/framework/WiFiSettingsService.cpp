@@ -25,6 +25,7 @@ void WiFiSettingsService::initWiFi() {
         WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
     WiFi.onEvent(std::bind(&WiFiSettingsService::onStationModeStop, this, std::placeholders::_1, std::placeholders::_2),
                  WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_STOP);
+    WiFi.onEvent(onStationModeGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
 
     _fsPersistence.readFromFS();
     reconfigureWiFiConnection();
@@ -132,8 +133,7 @@ void WiFiSettingsService::connectToWiFi() {
                 }
             }
         } else if (_state.priorityBySignalStrength == true && bestNetwork) {
-            ESP_LOGI("WiFiSettingsService", "Connecting to strongest network: %s, BSSID: " MACSTR " ",
-                     bestNetwork->ssid.c_str(), MAC2STR(bestNetwork->bssid));
+            ESP_LOGI("WiFiSettingsService", "Connecting to strongest known network: %s", bestNetwork->ssid.c_str());
             configureNetwork(*bestNetwork);
         } else // no suitable network to connect
         {
@@ -178,6 +178,11 @@ void WiFiSettingsService::onStationModeStop(WiFiEvent_t event, WiFiEventInfo_t i
         _lastConnectionAttempt = 0;
         _stopping = false;
     }
+}
+
+void WiFiSettingsService::onStationModeGotIP(WiFiEvent_t event, WiFiEventInfo_t info) {
+    ESP_LOGI("WiFiStatus", "WiFi Got IP. localIP=%s, hostName=%s", WiFi.localIP().toString().c_str(),
+             WiFi.getHostname());
 }
 
 namespace wifi_sta {

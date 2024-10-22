@@ -215,6 +215,7 @@ class WiFiSettingsService : public StatefulService<WiFiSettings> {
     bool _stopping;
     void onStationModeDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
     void onStationModeStop(WiFiEvent_t event, WiFiEventInfo_t info);
+    static void onStationModeGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
 
     void reconfigureWiFiConnection();
     void manageSTA();
