@@ -75,6 +75,7 @@
 	};
 
 	const calculateStats = () => {
+		if (!sessions) return;
 		statifiedSessions = sessions.map((session) => statify(session));
 
 		currentSession = statifiedSessions[statifiedSessions.length - 1];
@@ -174,31 +175,33 @@
 			</ResponsiveStats>
 		{/if}
 
-		<h2 class="text-2xl p-4 text-center">All time stats</h2>
-		<ResponsiveStats>
-			<Stat>
-				<span slot="title">Total Distance</span>
-				{f(totalDistance)} m
-				<span slot="desc">
-					{formatTimeRange(sessions[0].start, currentSession.end)}
-					({formatTime(totalTimeInWheel)})
-				</span>
-			</Stat>
+		{#if sessions}
+			<h2 class="text-2xl p-4 text-center">All time stats</h2>
+			<ResponsiveStats>
+				<Stat>
+					<span slot="title">Total Distance</span>
+					{f(totalDistance)} m
+					<span slot="desc">
+						{formatTimeRange(sessions[0].start, currentSession.end)}
+						({formatTime(totalTimeInWheel)})
+					</span>
+				</Stat>
 
-			<Stat>
-				<span slot="title">Top Speed</span>
-				{f(allTimeTopPace)} m/s
-				<span slot="desc">↗︎</span>
-			</Stat>
+				<Stat>
+					<span slot="title">Top Speed</span>
+					{f(allTimeTopPace)} m/s
+					<span slot="desc">↗︎</span>
+				</Stat>
 
-			<Stat>
-				<span slot="title">Average pace</span>
-				{f(allTimeAveragePace)} m/s
-				<span slot="desc">↗︎</span>
-			</Stat>
-		</ResponsiveStats>
+				<Stat>
+					<span slot="title">Average pace</span>
+					{f(allTimeAveragePace)} m/s
+					<span slot="desc">↗︎</span>
+				</Stat>
+			</ResponsiveStats>
 
-		<RunningChart {sessions} {circumference} />
-		<RunningChartAccumulation {sessions} {circumference} />
+			<RunningChart {sessions} {circumference} />
+			<RunningChartAccumulation {sessions} {circumference} />
+		{/if}
 	{/if}
 </SettingsCard>
