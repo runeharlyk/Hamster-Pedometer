@@ -61,10 +61,16 @@
 	const handleNetworkStatus = (data: RSSI) => telemetry.setRSSI(data);
 
 	const handleOAT = (data: DownloadOTA) => {
-		notifications.send(`${data.toFixed(1)}`, 'progress', 4000, 'Update');
-		console.log(data);
-
-		// telemetry.setDownloadOTA(data);
+		const id = 'update';
+		if (data.status === 'finished') {
+			notifications.success('Update finished', 4000, id);
+		} else if (data.status === 'progress') {
+			notifications.send(data.progress.toFixed(1), 'progress', 4000, id);
+		} else if (data.status === 'error') {
+			notifications.error('An error occurred while updating', 4000, id);
+			console.error(data.error);
+		}
+		telemetry.setDownloadOTA(data);
 	};
 
 	let menuOpen = false;

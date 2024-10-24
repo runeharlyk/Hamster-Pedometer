@@ -12,7 +12,7 @@
 		success: 'alert-success',
 		warning: 'alert-warning',
 		info: 'alert-info',
-		progress: 'alert-info'
+		progress: 'alert-neutral'
 	};
 
 	export let icon = {
