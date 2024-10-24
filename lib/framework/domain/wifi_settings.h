@@ -34,7 +34,6 @@ typedef struct {
     IPAddress dnsIP2;
     bool available;
 
-    // Serialize this wifi_settings_t instance to a JSON object
     void serialize(JsonObject &json) const {
         json["ssid"] = ssid;
         json["password"] = password;
@@ -49,10 +48,7 @@ typedef struct {
         }
     }
 
-    // Deserialize from a JSON object into this wifi_settings_t instance
-    // Returns true if deserialization was successful, false otherwise
     bool deserialize(const JsonObject &json) {
-        // Validate SSID and password lengths
         String newSsid = json["ssid"].as<String>();
         String newPassword = json["password"].as<String>();
 
@@ -61,12 +57,10 @@ typedef struct {
             return false;
         }
 
-        // Basic settings
         ssid = newSsid;
         password = newPassword;
         staticIPConfig = json["static_ip_config"] | false;
 
-        // Extended settings
         if (staticIPConfig) {
             JsonUtils::readIP(json, "local_ip", localIP);
             JsonUtils::readIP(json, "gateway_ip", gatewayIP);
@@ -74,20 +68,17 @@ typedef struct {
             JsonUtils::readIP(json, "dns_ip_1", dnsIP1);
             JsonUtils::readIP(json, "dns_ip_2", dnsIP2);
 
-            // Swap DNS servers if needed
             if (IPUtils::isNotSet(dnsIP1) && IPUtils::isSet(dnsIP2)) {
                 dnsIP1 = dnsIP2;
                 dnsIP2 = INADDR_NONE;
             }
 
-            // Validate static IP configuration
             if (IPUtils::isNotSet(localIP) || IPUtils::isNotSet(gatewayIP) || IPUtils::isNotSet(subnetMask)) {
                 staticIPConfig = false;
                 ESP_LOGW("WiFiSettings", "Invalid static IP configuration - falling back to DHCP");
             }
         }
 
-        // Reset scan result
         available = false;
         return true;
     }
@@ -147,7 +138,6 @@ class WiFiSettings {
                 }
             }
         } else if (String(FACTORY_WIFI_SSID).length() > 0) {
-            // Add factory default if no networks configured
             settings.wifiSettings.push_back(createDefaultWiFiSettings());
         }
 
