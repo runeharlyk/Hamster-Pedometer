@@ -20,7 +20,7 @@
 
 	async function getMQTTStatus() {
 		try {
-			const response = await fetch('/api/v1/mqttStatus', {
+			const response = await fetch('/api/v1/mqtt/status', {
 				method: 'GET',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
@@ -36,7 +36,7 @@
 
 	async function getMQTTSettings() {
 		try {
-			const response = await fetch('/api/v1/mqttSettings', {
+			const response = await fetch('/api/v1/mqtt/settings', {
 				method: 'GET',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',
@@ -71,7 +71,7 @@
 
 	async function postMQTTSettings(data: MQTTSettings) {
 		try {
-			const response = await fetch('/api/v1/mqttSettings', {
+			const response = await fetch('/api/v1/mqtt/settings', {
 				method: 'POST',
 				headers: {
 					Authorization: $page.data.features.security ? 'Bearer ' + $user.bearer_token : 'Basic',

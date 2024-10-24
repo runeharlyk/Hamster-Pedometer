@@ -16,12 +16,10 @@ void IRAM_ATTR hallSensorInterrupt() {
 }
 
 void PedoMeter::begin() {
-    _socket->onEvent("reset_pedometer", [&](JsonObject &root, int originId) {
+    socket.onEvent("reset_pedometer", [&](JsonObject &root, int originId) {
         _state.reset();
         _fsPersistence.writeToFS();
     });
-
-    _fsPersistence.readFromFS();
 
     pinMode(HALL_SENSOR_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(HALL_SENSOR_PIN), hallSensorInterrupt, FALLING);
@@ -57,7 +55,7 @@ void PedoMeter::_loop() {
 
             String output;
             serializeJson(doc, output);
-            _socket->emit(EVENT_STEP, output.c_str());
+            socket.emit(EVENT_STEP, output.c_str());
         }
 
         EXECUTE_EVERY_N_MS(30000,

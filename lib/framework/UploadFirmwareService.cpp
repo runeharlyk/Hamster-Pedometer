@@ -26,8 +26,7 @@ static size_t uploaded = 0;
 
 static FileType fileType = ft_none;
 
-UploadFirmwareService::UploadFirmwareService(PsychicHttpServer *server, EventSocket *socket)
-    : _server(server), _socket(socket) {}
+UploadFirmwareService::UploadFirmwareService() {}
 
 void UploadFirmwareService::begin() {
     uploadHandler.onUpload(std::bind(&UploadFirmwareService::handleUpload, this, _1, _2, _3, _4, _5, _6));
@@ -104,7 +103,7 @@ esp_err_t UploadFirmwareService::handleUpload(PsychicRequest *request, const Str
             uploaded += len;
             char buffer[16];
             snprintf(buffer, sizeof(buffer), "%f", (float)uploaded / (float)fsize * 100.f);
-            _socket->emit("otastatus", buffer);
+            socket.emit("otastatus", buffer);
             delay(20);
             ESP_LOGI(TAG, "Wrote more %d (%d/%d) - %s", len, uploaded, fsize, buffer);
         }
@@ -112,7 +111,7 @@ esp_err_t UploadFirmwareService::handleUpload(PsychicRequest *request, const Str
             if (!Update.end(true)) {
                 handleError(request, 500);
             } else {
-                _socket->emit("otastatus", "100");
+                socket.emit("otastatus", "100");
                 ESP_LOGI(TAG, "Finish writing update");
             }
         }

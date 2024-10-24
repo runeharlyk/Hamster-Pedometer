@@ -8,9 +8,8 @@
 #include <ESPFS.h>
 #include <ESPmDNS.h>
 #include <EventSocket.h>
-#include <FeaturesService.h>
+#include <features_service.h>
 #include <MqttSettingsService.h>
-#include <MqttStatus.h>
 #include <NTPSettingsService.h>
 #include <PedoMeter.h>
 #include <PsychicHttp.h>
@@ -40,11 +39,7 @@ class ESP32SvelteKit {
 
     void begin();
 
-    FS *getFS() { return &ESPFS; }
-
     PsychicHttpServer *getServer() { return _server; }
-
-    EventSocket *getSocket() { return &_socket; }
 
     StatefulService<WiFiSettings> *getWiFiSettingsService() { return &_wifiSettingsService; }
 
@@ -68,7 +63,6 @@ class ESP32SvelteKit {
     PsychicHttpServer *_server;
     WiFiSettingsService _wifiSettingsService;
     APSettingsService _apSettingsService;
-    EventSocket _socket;
 #if FT_ENABLED(USE_NTP)
     NTPSettingsService _ntpSettingsService;
 #endif
@@ -80,7 +74,6 @@ class ESP32SvelteKit {
 #endif
 #if FT_ENABLED(USE_MQTT)
     MqttSettingsService _mqttSettingsService;
-    MqttStatus _mqttStatus;
 #endif
 #if FT_ENABLED(USE_ANALYTICS)
     AnalyticsService _analyticsService;

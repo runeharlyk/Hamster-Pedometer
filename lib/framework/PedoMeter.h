@@ -111,9 +111,8 @@ class PedoMeterData {
 
 class PedoMeter : public StatefulService<PedoMeterData> {
   public:
-    PedoMeter(PsychicHttpServer *server, EventSocket *socket)
-        : _socket(socket),
-          endpoint(PedoMeterData::read, PedoMeterData::update, this),
+    PedoMeter()
+        : endpoint(PedoMeterData::read, PedoMeterData::update, this),
           _fsPersistence(PedoMeterData::read, PedoMeterData::update, this, STEPS_FILE) {};
 
     void begin();
@@ -122,7 +121,6 @@ class PedoMeter : public StatefulService<PedoMeterData> {
 
   protected:
     FSPersistence<PedoMeterData> _fsPersistence;
-    EventSocket *_socket;
 
     static void _loopImpl(void *_this) { static_cast<PedoMeter *>(_this)->_loop(); }
     void _loop();

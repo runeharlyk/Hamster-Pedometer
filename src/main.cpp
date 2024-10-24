@@ -3,12 +3,14 @@
 
 DRAM_ATTR PsychicHttpServer server;
 
-DRAM_ATTR ESP32SvelteKit esp32sveltekit(&server);
+std::unique_ptr<ESP32SvelteKit> g_ptrApp;
 
 void setup() {
     Serial.begin(115200);
+    ESPFS.begin(true);
 
-    esp32sveltekit.begin();
+    g_ptrApp = std::make_unique<ESP32SvelteKit>(&server);
+    g_ptrApp->begin();
 }
 
 void loop() { vTaskDelete(nullptr); }

@@ -2,35 +2,11 @@
 
 static const char *TAG = "ESP32SvelteKit";
 
-ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server)
-    : _server(server),
-      _wifiSettingsService(server, &_socket),
-      _apSettingsService(server),
-      _socket(server),
-#if FT_ENABLED(USE_NTP)
-      _ntpSettingsService(server),
-#endif
-#if FT_ENABLED(USE_UPLOAD_FIRMWARE)
-      _uploadFirmwareService(server, &_socket),
-#endif
-#if FT_ENABLED(USE_DOWNLOAD_FIRMWARE)
-      _downloadFirmwareService(&_socket),
-#endif
-#if FT_ENABLED(USE_MQTT)
-      _mqttSettingsService(server),
-      _mqttStatus(server, &_mqttSettingsService),
-#endif
-#if FT_ENABLED(USE_ANALYTICS)
-      _analyticsService(&_socket),
-#endif
-      _pedoMeter(server, &_socket) {
-}
+ESP32SvelteKit::ESP32SvelteKit(PsychicHttpServer *server) : _server(server) {}
 
 void ESP32SvelteKit::begin() {
     ESP_LOGV("ESP32SvelteKit", "Loading settings from files system");
     ESP_LOGI(TAG, "Running Firmware Version: %s\n", APP_VERSION);
-
-    ESPFS.begin(true);
 
     _wifiSettingsService.initWiFi();
 
@@ -115,16 +91,24 @@ void ESP32SvelteKit::setupServer() {
 
     // MISC
     _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
-    if (!_socket.getHandler()) {
-        ESP_LOGE(TAG, "Could not get socket ptr");
-    }
-    _server->on("/ws/events", _socket.getHandler());
+    _server->on("/ws/events", socket.getHandler());
     _server->on("/api/v1/firmware", HTTP_POST, _uploadFirmwareService.getHandler());
 
     // FIRMWARE
 #if FT_ENABLED(USE_DOWNLOAD_FIRMWARE)
     _server->on("/api/v1/firmware/download", HTTP_POST, [this](PsychicRequest *r, JsonVariant &json) {
         return _downloadFirmwareService.handleDownloadUpdate(r, json);
+    });
+#endif
+
+    // MQTT
+#if FT_ENABLED(USE_MQTT)
+    _server->on("/api/v1/mqtt/status", HTTP_GET,
+                [this](PsychicRequest *r) { return _mqttSettingsService.getStatus(r); });
+    _server->on("/api/v1/mqtt/settings", HTTP_GET,
+                [this](PsychicRequest *r) { return _mqttSettingsService.endpoint.getState(r); });
+    _server->on("/api/v1/mqtt/settings", HTTP_POST, [this](PsychicRequest *r, JsonVariant &json) {
+        return _mqttSettingsService.endpoint.handleStateUpdate(r, json);
     });
 #endif
 
@@ -155,7 +139,6 @@ void ESP32SvelteKit::setupMDNS() {
 }
 
 void ESP32SvelteKit::startServices() {
-    _socket.begin();
     _apSettingsService.begin();
     _wifiSettingsService.begin();
 
@@ -167,7 +150,6 @@ void ESP32SvelteKit::startServices() {
 #endif
 #if FT_ENABLED(USE_MQTT)
     _mqttSettingsService.begin();
-    _mqttStatus.begin();
 #endif
     _pedoMeter.begin();
 
