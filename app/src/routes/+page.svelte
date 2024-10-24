@@ -1,8 +1,5 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import logo from '$lib/assets/logo.png';
-
-	export let data: PageData;
 </script>
 
 <div class="hero bg-base-100 h-screen">

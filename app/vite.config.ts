@@ -4,27 +4,10 @@ import Icons from 'unplugin-icons/vite';
 import viteLittleFS from './vite-plugin-littlefs';
 
 const config: UserConfig = {
-	plugins: [
-		sveltekit(),
-		Icons({
-			compiler: 'svelte'
-		}),
-		// Shorten file names for LittleFS 32 char limit
-		viteLittleFS()
-	],
+	plugins: [sveltekit(), Icons({ compiler: 'svelte' }), viteLittleFS()],
 	server: {
 		proxy: {
-			// Proxying REST: http://localhost:5173/api/v1/bar -> http://192.168.1.83/api/v1/bar
-			'/api/v1': {
-				target: 'http://hamster-pedometer.local/',
-				changeOrigin: true
-			},
 			'/api': {
-				target: 'http://hamster-pedometer.local/',
-				changeOrigin: true
-			},
-			// Proxying websockets ws://localhost:5173/ws -> ws://192.168.1.83/ws
-			'/ws': {
 				target: 'http://hamster-pedometer.local/',
 				changeOrigin: true,
 				ws: true

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { LayoutData } from './$types';
 	import { onDestroy, onMount } from 'svelte';
 	import { telemetry } from '$lib/stores/telemetry';
 	import { analytics } from '$lib/stores/analytics';
@@ -16,10 +15,8 @@
 	import type { RSSI } from '$lib/types/models';
 	import type { DownloadOTA } from '$lib/types/models';
 
-	export let data: LayoutData;
-
 	onMount(() => {
-		socket.init(`ws://${window.location.host}/ws/events`);
+		socket.init(`ws://${window.location.host}/api/v1/ws/events`);
 
 		addEventListeners();
 	});
@@ -102,6 +99,7 @@
 
 <Modals>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
 		slot="backdrop"
 		class="fixed inset-0 z-40 max-h-full max-w-full bg-black/20 backdrop-blur"

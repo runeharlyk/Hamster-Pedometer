@@ -106,12 +106,6 @@ proxy: {
     target: 'http://192.168.1.83',
     changeOrigin: true,
     },
-    // Proxying websockets ws://localhost:5173/ws -> ws://192.168.1.83/ws
-    '/ws': {
-    target: 'ws://192.168.1.83',
-    changeOrigin: true,
-    ws: true,
-    },
 },
 ```
 

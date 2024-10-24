@@ -91,7 +91,7 @@ void ESP32SvelteKit::setupServer() {
 
     // MISC
     _server->on("/api/v1/features", HTTP_GET, feature_service::getFeatures);
-    _server->on("/ws/events", socket.getHandler());
+    _server->on("/api/v1/ws/events", socket.getHandler());
     _server->on("/api/v1/firmware", HTTP_POST, _uploadFirmwareService.getHandler());
 
     // FIRMWARE
