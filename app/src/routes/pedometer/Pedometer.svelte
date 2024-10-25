@@ -75,7 +75,7 @@
 	};
 
 	const calculateStats = () => {
-		if (!sessions) return;
+		if (!sessions.length) return;
 		statifiedSessions = sessions.map((session) => statify(session));
 
 		currentSession = statifiedSessions[statifiedSessions.length - 1];
@@ -175,7 +175,7 @@
 			</ResponsiveStats>
 		{/if}
 
-		{#if sessions}
+		{#if sessions.length}
 			<h2 class="text-2xl p-4 text-center">All time stats</h2>
 			<ResponsiveStats>
 				<Stat>

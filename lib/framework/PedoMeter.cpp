@@ -24,14 +24,7 @@ void PedoMeter::begin() {
     pinMode(HALL_SENSOR_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(HALL_SENSOR_PIN), hallSensorInterrupt, FALLING);
 
-    xTaskCreatePinnedToCore(this->_loopImpl,    // Function that should be called
-                            "Pedometer",        // Name of the task (for debugging)
-                            5120,               // Stack size (bytes)
-                            this,               // Pass reference to this class instance
-                            (tskIDLE_PRIORITY), // task priority
-                            NULL,               // Task handle
-                            1                   // Pin to application core
-    );
+    xTaskCreatePinnedToCore(this->_loopImpl, "Pedometer", 5120, this, (tskIDLE_PRIORITY), NULL, 1);
 }
 
 void PedoMeter::_loop() {
@@ -49,13 +42,12 @@ void PedoMeter::_loop() {
                 _state.startSession();
             } else {
                 _state.updateSession(timeElapsed);
+                doc["time_elapsed"] = timeElapsed;
+
+                String output;
+                serializeJson(doc, output);
+                socket.emit(EVENT_STEP, output.c_str());
             }
-
-            doc["time_elapsed"] = timeElapsed;
-
-            String output;
-            serializeJson(doc, output);
-            socket.emit(EVENT_STEP, output.c_str());
         }
 
         EXECUTE_EVERY_N_MS(30000,
