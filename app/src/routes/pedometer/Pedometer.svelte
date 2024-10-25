@@ -11,6 +11,7 @@
 	import type { Session, Sessions } from '$lib/types/models';
 	import RunningChart from './runningChart.svelte';
 	import RunningChartAccumulation from './runningChartAccumulation.svelte';
+	import { currentSpeed } from '$lib/stores/pedometer';
 
 	let isLoading = true;
 
@@ -30,8 +31,6 @@
 		averagePace: number;
 		sessionMin: number;
 	};
-
-	let speedMetersPerSecond = 0;
 
 	let isRunning = false;
 	let stopTimer: string | number | NodeJS.Timeout | undefined;
@@ -53,14 +52,14 @@
 			}
 			isRunning = true;
 
-			speedMetersPerSecond = circumference / newData.time_elapsed;
+			currentSpeed.set(circumference / newData.time_elapsed);
 			sessions[sessions.length - 1].times.push(newData.time_elapsed);
 			sessions[sessions.length - 1].steps += 1;
 			calculateStats();
 			clearTimeout(stopTimer);
 			stopTimer = setTimeout(() => {
 				isRunning = false;
-				speedMetersPerSecond = 0;
+				currentSpeed.set(0);
 			}, 2000);
 		});
 
@@ -119,19 +118,6 @@
 
 	onDestroy(() => socket.off('step'));
 
-	let rotationAngle = 0;
-	let lastTime = 0;
-	const speedControl = 0.5;
-
-	const rotateDiv = (time: number) => {
-		if (lastTime) {
-			const deltaTime = time - lastTime;
-			rotationAngle -= speedMetersPerSecond * deltaTime * speedControl;
-		}
-		lastTime = time;
-		requestAnimationFrame(rotateDiv);
-	};
-
 	const reset = () => socket.sendEvent('reset_pedometer', '');
 
 	const f = (val: number) => Math.max(val, 0).toFixed(1);
@@ -143,7 +129,9 @@
 	</button>
 
 	<div class="grid place-items-center">
-		<Hamster {speedMetersPerSecond} {rotationAngle} />
+		<div class="w-48 h-48">
+			<Hamster />
+		</div>
 	</div>
 
 	{#if isLoading}
@@ -169,7 +157,7 @@
 
 				<Stat>
 					<span slot="title">Pace</span>
-					{f(speedMetersPerSecond)} m/s
+					{f($currentSpeed)} m/s
 					<!-- <span slot="desc">↗︎</span> -->
 				</Stat>
 			</ResponsiveStats>

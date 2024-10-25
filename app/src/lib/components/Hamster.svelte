@@ -1,14 +1,26 @@
 <script lang="ts">
-	export let speedMetersPerSecond;
-	export let rotationAngle;
+	import { currentSpeed } from '$lib/stores/pedometer';
+
+	let rotationAngle = 0;
+	let lastTime = 0;
+	const speedControl = 0.5;
+
+	const rotateDiv = (time: number) => {
+		if (lastTime) {
+			const deltaTime = time - lastTime;
+			rotationAngle -= $currentSpeed * deltaTime * speedControl;
+		}
+		lastTime = time;
+		requestAnimationFrame(rotateDiv);
+	};
 </script>
 
 <!-- https://codepen.io/jkantner/details/wvqeXrQ -->
 <div
-	class="relative w-48 h-48"
+	class="relative w-full h-full aspect-square"
 	role="img"
 	aria-label="Orange and tan hamster running in a metal wheel"
-	style="--speed: {1 / speedMetersPerSecond}s"
+	style="--speed: {1 / $currentSpeed}s"
 >
 	<div class="wheel"></div>
 	<div class="hamster">

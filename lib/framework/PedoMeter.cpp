@@ -11,8 +11,8 @@ void IRAM_ATTR hallSensorInterrupt() {
         eventTriggered = true;
         count += 1;
         timeElapsed = (currentTime - lastDebounceTime) / 1000.0; // time in seconds
-        lastDebounceTime = currentTime;
     }
+    lastDebounceTime = currentTime;
 }
 
 void PedoMeter::begin() {
@@ -31,6 +31,7 @@ void PedoMeter::_loop() {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     JsonDocument doc;
     bool isInSession = false;
+    float lastTimeElapsed = 0;
 
     while (1) {
         unsigned long currentTime = millis();
